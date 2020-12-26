@@ -1,0 +1,48 @@
+package io.github.ititus.skat.scene;
+
+import io.github.ititus.skat.Main;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.BorderPane;
+
+public abstract class Gui extends BorderPane {
+
+    private static final KeyCodeCombination EXIT_KEYBIND = new KeyCodeCombination(KeyCode.ESCAPE);
+
+    protected Main main;
+    protected Gui previousGui;
+
+    protected Gui() {
+        setMinWidth(200);
+        setMinHeight(200);
+
+        setOnKeyPressed(this::onKeyPressed);
+    }
+
+    public void setMain(Main main) {
+        this.main = main;
+    }
+
+    public void setPreviousGui(Gui previousGui) {
+        this.previousGui = previousGui;
+    }
+
+    public void close() {
+        if (previousGui != null) {
+            main.openGui(previousGui, true);
+        } else {
+            main.exit();
+        }
+    }
+
+    public boolean isResizable() {
+        return true;
+    }
+
+    protected void onKeyPressed(KeyEvent event) {
+        if (EXIT_KEYBIND.match(event)) {
+            close();
+        }
+    }
+}

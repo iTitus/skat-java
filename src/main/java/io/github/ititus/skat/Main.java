@@ -1,33 +1,63 @@
 package io.github.ititus.skat;
 
-import io.github.ititus.skat.network.NetworkClient;
+import io.github.ititus.skat.scene.ConnectGui;
+import io.github.ititus.skat.scene.Gui;
 import javafx.application.Application;
-import javafx.scene.Group;
+import javafx.application.Platform;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 public class Main extends Application {
 
-    static {
-        System.setProperty("java.util.logging.config.file", "logging.properties");
-    }
+    private Stage stage;
 
     public static void main(String[] args) {
         launch(args);
     }
 
     @Override
-    public void start(Stage stage) throws Exception {
-        Text t = new Text(10, 20, "Hello World");
+    public void start(Stage primaryStage) throws Exception {
+        stage = primaryStage;
 
-        Group root = new Group(t);
+        openGui(new ConnectGui(), true);
 
-        Scene scene = new Scene(root, 640, 480);
-        stage.setScene(scene);
-        stage.setTitle("Skat");
-        stage.show();
+        primaryStage.setTitle("Skat");
+        primaryStage.show();
+    }
 
-        NetworkClient client = new NetworkClient();
+    public void openGui(Gui gui) {
+        openGui(gui, false);
+    }
+
+    public void openGui(Gui gui, boolean replace) {
+        gui.setMain(this);
+
+        Scene scene = stage.getScene();
+        if (scene == null) {
+            scene = new Scene(gui);
+            stage.setScene(scene);
+        } else {
+            Parent oldRoot = scene.getRoot();
+            if (oldRoot instanceof Gui) {
+                Gui oldGui = (Gui) oldRoot;
+                if (!replace) {
+                    gui.setPreviousGui(oldGui);
+                }
+            }
+
+            scene.setRoot(gui);
+        }
+
+        stage.sizeToScene();
+        stage.setResizable(gui.isResizable());
+    }
+
+    public void exit() {
+        Platform.exit();
+    }
+
+    public Stage getStage() {
+        return stage;
     }
 }
