@@ -13,7 +13,6 @@ wrapper {
 }
 
 java {
-    modularity.inferModulePath = true
     sourceCompatibility = targetCompatibility = JavaVersion.VERSION_11
 
     withSourcesJar()
@@ -21,7 +20,6 @@ java {
 }
 
 application {
-    mainModule = 'io.github.ititus.skat'
     mainClass = 'io.github.ititus.skat.Main'
 
     applicationDefaultJvmArgs = ['-Djava.util.logging.config.file=logging.properties']
@@ -34,6 +32,7 @@ repositories {
 
 dependencies {
     implementation 'io.github.ititus:ititus-commons:1.2.7'
+    implementation 'it.unimi.dsi:fastutil:8.4.4'
     implementation 'io.netty:netty-all:4.1.56.Final'
 
     testImplementation platform('org.junit:junit-bom:5.7.0')
@@ -51,9 +50,9 @@ javafx {
     modules = ['javafx.base', 'javafx.controls', 'javafx.graphics', 'javafx.fxml']
 }
 
-jlink {
+/*jlink {
     options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
     launcher {
         name = 'skat'
     }
-}
+}*/

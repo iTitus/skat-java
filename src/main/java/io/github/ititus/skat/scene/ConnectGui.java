@@ -10,17 +10,19 @@ import javafx.scene.text.Text;
 
 public class ConnectGui extends Gui {
 
+    private final TextField hostField, portField;
+
     public ConnectGui() {
         Text label1 = new Text("Host");
-        TextField input1 = new TextField("localhost");
-        input1.setPromptText("Host");
-        HBox inputBox1 = new HBox(10, label1, input1);
+        hostField = new TextField("localhost");
+        hostField.setPromptText("Host");
+        HBox inputBox1 = new HBox(10, label1, hostField);
         inputBox1.setAlignment(Pos.CENTER);
 
         Text label2 = new Text("Port");
-        TextField input2 = new TextField("55555");
-        input2.setPromptText("Port");
-        HBox inputBox2 = new HBox(10, label2, input2);
+        portField = new TextField("55555");
+        portField.setPromptText("Port");
+        HBox inputBox2 = new HBox(10, label2, portField);
         inputBox2.setAlignment(Pos.CENTER);
 
         Button connectButton = new Button("Connect");
@@ -38,6 +40,28 @@ public class ConnectGui extends Gui {
 
         sceneProperty().addListener((observable, oldValue, newValue) -> connectButton.requestFocus());
 
-        connectButton.setOnAction(event -> main.openGui(new LoadingGui("Connecting...")));
+        connectButton.setOnAction(event -> connect());
+    }
+
+    private void connect() {
+        String host = hostField.getText();
+        int port;
+        try {
+            port = Integer.parseInt(portField.getText());
+        } catch (NumberFormatException ignored) {
+            showError("Port is not a valid number");
+            return;
+        }
+
+        if (port <= 0) {
+            showError("Port must be positive");
+            return;
+        }
+
+        main.connect(host, port);
+    }
+
+    private void showError(String error) {
+        System.out.println("ERROR: " + error);
     }
 }

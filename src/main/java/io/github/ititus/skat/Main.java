@@ -1,7 +1,10 @@
 package io.github.ititus.skat;
 
+import io.github.ititus.skat.network.NetworkManager;
 import io.github.ititus.skat.scene.ConnectGui;
 import io.github.ititus.skat.scene.Gui;
+import io.github.ititus.skat.scene.JoinGui;
+import io.github.ititus.skat.scene.LoadingGui;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Parent;
@@ -11,6 +14,7 @@ import javafx.stage.Stage;
 public class Main extends Application {
 
     private Stage stage;
+    private NetworkManager networkManager;
 
     public static void main(String[] args) {
         launch(args);
@@ -26,11 +30,23 @@ public class Main extends Application {
         primaryStage.show();
     }
 
+    @Override
+    public void stop() throws Exception {
+        if (networkManager != null) {
+            networkManager.stop();
+        }
+    }
+
     public void openGui(Gui gui) {
         openGui(gui, false);
     }
 
     public void openGui(Gui gui, boolean replace) {
+        if (!Platform.isFxApplicationThread()) {
+            Platform.runLater(() -> openGui(gui, replace));
+            return;
+        }
+
         gui.setMain(this);
 
         Scene scene = stage.getScene();
@@ -59,5 +75,15 @@ public class Main extends Application {
 
     public Stage getStage() {
         return stage;
+    }
+
+    public NetworkManager getNetworkManager() {
+        return networkManager;
+    }
+
+    public void connect(String host, int port) {
+        System.out.println("Connecting to " + host + ":" + port);
+        openGui(new LoadingGui("Connecting..."));
+        networkManager = new NetworkManager(host, port, () -> openGui(new JoinGui()));
     }
 }
