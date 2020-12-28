@@ -1,4 +1,4 @@
-package io.github.ititus.skat.scene;
+package io.github.ititus.skat.gui;
 
 import javafx.scene.input.KeyEvent;
 

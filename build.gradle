@@ -13,6 +13,7 @@ wrapper {
 }
 
 java {
+    modularity.inferModulePath = true
     sourceCompatibility = targetCompatibility = JavaVersion.VERSION_11
 
     withSourcesJar()
@@ -20,6 +21,7 @@ java {
 }
 
 application {
+    mainModule = 'io.github.ititus.skat'
     mainClass = 'io.github.ititus.skat.Main'
 
     applicationDefaultJvmArgs = ['-Djava.util.logging.config.file=logging.properties']
@@ -47,11 +49,11 @@ test {
 
 javafx {
     version = '15.0.1'
-    modules = ['javafx.base', 'javafx.controls', 'javafx.graphics', 'javafx.fxml']
+    modules = ['javafx.base', 'javafx.controls', 'javafx.graphics']
 }
 
 jlink {
-    options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
+    options = ['--strip-debug', '--no-header-files', '--no-man-pages', '--compress', '2']
     launcher {
         name = 'skat'
     }

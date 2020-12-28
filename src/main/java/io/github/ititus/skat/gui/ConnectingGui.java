@@ -1,4 +1,4 @@
-package io.github.ititus.skat.scene;
+package io.github.ititus.skat.gui;
 
 import io.github.ititus.skat.network.NetworkManager;
 import javafx.application.Platform;
@@ -26,7 +26,7 @@ public class ConnectingGui extends LoadingGui {
                             if (!main.isExit()) {
                                 main.stopNetworkManagerAsync();
                                 Platform.runLater(() -> {
-                                    ConnectGui gui = new ConnectGui();
+                                    ConnectGui gui = (ConnectGui) previousGui;
                                     gui.showError("Lost connection to server");
                                     main.openGui(gui, true);
                                 });

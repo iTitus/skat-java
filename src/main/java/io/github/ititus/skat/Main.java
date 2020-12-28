@@ -1,9 +1,9 @@
 package io.github.ititus.skat;
 
+import io.github.ititus.skat.gui.ConnectGui;
+import io.github.ititus.skat.gui.ExitingGui;
+import io.github.ititus.skat.gui.Gui;
 import io.github.ititus.skat.network.NetworkManager;
-import io.github.ititus.skat.scene.ConnectGui;
-import io.github.ititus.skat.scene.ExitingGui;
-import io.github.ititus.skat.scene.Gui;
 import io.netty.channel.ChannelFuture;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -16,8 +16,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Main extends Application {
 
-    private Stage stage;
     private final AtomicBoolean exit = new AtomicBoolean(false);
+    private Stage stage;
     private NetworkManager networkManager;
 
     public static void main(String[] args) {
@@ -25,7 +25,7 @@ public class Main extends Application {
     }
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
         stage = primaryStage;
 
         openGui(new ConnectGui(), true);
@@ -101,6 +101,7 @@ public class Main extends Application {
     }
 
     public void exit() {
+        exit.set(true);
         openGui(new ExitingGui());
         Platform.exit();
     }
@@ -118,7 +119,9 @@ public class Main extends Application {
     }
 
     public void setNetworkManager(NetworkManager networkManager) {
-        if (this.networkManager != null && networkManager != null) {
+        if (networkManager == null) {
+            throw new RuntimeException("cannot set the NetworkManager to null, it needs to be closed first");
+        } else if (this.networkManager != null) {
             throw new RuntimeException("cannot change an existing NetworkManager");
         }
 

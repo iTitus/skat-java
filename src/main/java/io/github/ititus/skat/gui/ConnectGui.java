@@ -1,4 +1,4 @@
-package io.github.ititus.skat.scene;
+package io.github.ititus.skat.gui;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
