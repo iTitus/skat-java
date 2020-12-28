@@ -1,6 +1,6 @@
 package io.github.ititus.skat.gui;
 
-import io.github.ititus.skat.network.packet.TestPacket;
+import io.github.ititus.skat.network.packet.ErrorPacket;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -19,7 +19,10 @@ public class JoinGui extends Gui {
         disconnect.setOnAction(event -> main.disconnect("Disconnect"));
 
         Button testSender = new Button("Send invalid packet to server");
-        testSender.setOnAction(event -> main.getNetworkManager().sendPacket(new TestPacket()));
+        testSender.setOnAction(
+                event -> main.getNetworkManager()
+                        .sendPacket(new ErrorPacket(ErrorPacket.ConnectionErrorType.DISCONNECTED))
+        );
 
         HBox hb = new HBox(10, disconnect, testSender);
         hb.setAlignment(Pos.CENTER);

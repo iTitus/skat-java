@@ -1,8 +1,10 @@
 package io.github.ititus.skat.network.buffer;
 
 import io.github.ititus.math.number.BigIntegerMath;
+import io.github.ititus.skat.network.NetworkEnum;
 import io.github.ititus.skat.util.MathUtil;
 import io.netty.buffer.ByteBuf;
+import it.unimi.dsi.fastutil.bytes.Byte2ObjectFunction;
 import it.unimi.dsi.fastutil.bytes.ByteArrayList;
 import it.unimi.dsi.fastutil.bytes.ByteList;
 
@@ -281,6 +283,16 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
         buf.readerIndex(currentIndex);
 
         return b.toString();
+    }
+
+    @Override
+    public <T extends NetworkEnum<T>> T readEnum(Byte2ObjectFunction<T> enumFactory) {
+        return enumFactory.get(readByte());
+    }
+
+    @Override
+    public <T extends NetworkEnum<T>> void writeEnum(T value) {
+        writeByte(value.getId());
     }
 
     enum Type {

@@ -15,7 +15,7 @@ public class PacketEncoder extends MessageToByteEncoder<Packet> {
 
         WritablePacketBuffer buf = new PacketBufferImpl(out);
 
-        byte id = ctx.channel().attr(NetworkManager.PROTOCOL).get().getId(p);
+        byte id = p.getType().getId();
         buf.writeByte(id);
 
         p.write(buf);

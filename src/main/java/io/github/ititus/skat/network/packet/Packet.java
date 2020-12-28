@@ -1,12 +1,19 @@
 package io.github.ititus.skat.network.packet;
 
-import io.github.ititus.skat.network.buffer.ReadablePacketBuffer;
-import io.github.ititus.skat.network.buffer.WritablePacketBuffer;
+import io.github.ititus.skat.network.buffer.PacketBufferSerializer;
 
-public interface Packet {
+public abstract class Packet implements PacketBufferSerializer {
 
-    void read(ReadablePacketBuffer buf);
+    private final PacketType type;
 
-    void write(WritablePacketBuffer buf);
+    protected Packet(PacketType type) {
+        this.type = type;
+    }
+
+    public PacketType getType() {
+        return type;
+    }
+
+    public abstract void handleClient();
 
 }

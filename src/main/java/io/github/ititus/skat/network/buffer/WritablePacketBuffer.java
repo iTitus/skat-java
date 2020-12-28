@@ -1,5 +1,7 @@
 package io.github.ititus.skat.network.buffer;
 
+import io.github.ititus.skat.network.NetworkEnum;
+
 import java.math.BigInteger;
 
 public interface WritablePacketBuffer extends PacketBuffer {
@@ -23,5 +25,7 @@ public interface WritablePacketBuffer extends PacketBuffer {
     void writeLong(long n);
 
     void writeUnsignedLong(BigInteger n);
+
+    <T extends NetworkEnum<T>> void writeEnum(T value);
 
 }

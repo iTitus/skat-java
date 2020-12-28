@@ -1,7 +1,6 @@
 package io.github.ititus.skat.network;
 
 import io.github.ititus.skat.network.packet.Packet;
-import io.github.ititus.skat.network.packet.TestPacket;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -9,21 +8,17 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
-import io.netty.util.AttributeKey;
 import io.netty.util.concurrent.DefaultThreadFactory;
-import javafx.application.Platform;
 
 import java.net.InetSocketAddress;
 import java.util.Optional;
-import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 public class NetworkManager extends SimpleChannelInboundHandler<Packet> {
 
-    public static final AttributeKey<NetworkProtocol> PROTOCOL = AttributeKey.newInstance("protocol");
+    public static final int VERSION = 4;
 
     private final InetSocketAddress socketAddress;
-    private final NetworkProtocol protocol;
     private final Runnable connectionEstablishedListener;
     private final EventLoopGroup eventLoopGroup;
     private final ChannelFuture channelFuture;
@@ -32,7 +27,6 @@ public class NetworkManager extends SimpleChannelInboundHandler<Packet> {
     public NetworkManager(String host, int port, Runnable connectionEstablishedListener,
                           Consumer<Throwable> connectionFailedListener, Runnable disconnectListener) {
         this.socketAddress = InetSocketAddress.createUnresolved(host, port);
-        this.protocol = new NetworkProtocol();
         this.connectionEstablishedListener = connectionEstablishedListener;
         this.disconnectListener = disconnectListener;
 
@@ -68,8 +62,6 @@ public class NetworkManager extends SimpleChannelInboundHandler<Packet> {
     public void channelActive(ChannelHandlerContext ctx) {
         System.out.println("NetworkManager.channelActive");
 
-        ctx.channel().attr(PROTOCOL).set(protocol);
-
         connectionEstablishedListener.run();
         ctx.channel().closeFuture().addListener(f -> disconnectListener.run());
     }
@@ -85,17 +77,8 @@ public class NetworkManager extends SimpleChannelInboundHandler<Packet> {
     protected void channelRead0(ChannelHandlerContext ctx, Packet p) {
         System.out.println("NetworkManager.channelRead0: p=" + p);
 
-        Executors.newFixedThreadPool(1).submit(() -> {
-            // add card to middle
-
-            Platform.runLater(() -> {
-                // start play card animation
-            });
-        });
-
-        if (p instanceof TestPacket) {
-            System.out.println("  content=" + ((TestPacket) p).getContent());
-        }
+        // TODO: handle this on a different thread
+        p.handleClient();
     }
 
     @Override
