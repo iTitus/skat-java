@@ -22,6 +22,10 @@ public abstract class Gui extends BorderPane {
         this.main = main;
     }
 
+    public Gui getPreviousGui() {
+        return previousGui;
+    }
+
     public void setPreviousGui(Gui previousGui) {
         this.previousGui = previousGui;
     }
@@ -41,9 +45,13 @@ public abstract class Gui extends BorderPane {
         return true;
     }
 
+    protected boolean closeOnEsc() {
+        return true;
+    }
+
     public boolean onKeyPressed(KeyEvent event) {
         System.out.println("Gui.onKeyPressed in " + this + ", event=" + event);
-        if (EXIT_KEYBIND.match(event)) {
+        if (closeOnEsc() && EXIT_KEYBIND.match(event)) {
             close();
             return true;
         }

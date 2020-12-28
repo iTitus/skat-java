@@ -3,6 +3,7 @@ package io.github.ititus.skat;
 import io.github.ititus.skat.gui.ConnectGui;
 import io.github.ititus.skat.gui.ExitingGui;
 import io.github.ititus.skat.gui.Gui;
+import io.github.ititus.skat.gui.LoadingGui;
 import io.github.ititus.skat.network.NetworkManager;
 import io.netty.channel.ChannelFuture;
 import javafx.application.Application;
@@ -17,6 +18,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class Main extends Application {
 
     private final AtomicBoolean exit = new AtomicBoolean(false);
+    private final AtomicBoolean disconnect = new AtomicBoolean(false);
     private Stage stage;
     private NetworkManager networkManager;
 
@@ -38,24 +40,6 @@ public class Main extends Application {
     public void stop() {
         exit.set(true);
         stopNetworkManager();
-    }
-
-    public void stopNetworkManager() {
-        if (networkManager != null) {
-            NetworkManager mgr = networkManager;
-            networkManager = null;
-            mgr.stop();
-        }
-    }
-
-    public Optional<ChannelFuture> stopNetworkManagerAsync() {
-        if (networkManager != null) {
-            NetworkManager mgr = networkManager;
-            networkManager = null;
-            return mgr.stopAsync();
-        }
-
-        return Optional.empty();
     }
 
     public void openGui(Gui gui) {
@@ -106,14 +90,6 @@ public class Main extends Application {
         Platform.exit();
     }
 
-    public Stage getStage() {
-        return stage;
-    }
-
-    public boolean isExit() {
-        return exit.get();
-    }
-
     public NetworkManager getNetworkManager() {
         return networkManager;
     }
@@ -126,5 +102,65 @@ public class Main extends Application {
         }
 
         this.networkManager = networkManager;
+    }
+
+    public void disconnect(String reason) {
+        if (disconnect.get() || exit.get()
+                || Optional.ofNullable(stage).map(Stage::getScene).map(Scene::getRoot).filter(root -> root instanceof ConnectGui).isPresent()) {
+            return;
+        }
+
+        disconnect.set(true);
+        openGui(new LoadingGui("Closing connection..."));
+
+        Runnable r = () -> {
+            Optional<Gui> rootGuiOpt = Optional.ofNullable(stage)
+                    .map(Stage::getScene)
+                    .map(Scene::getRoot)
+                    .filter(root -> root instanceof Gui)
+                    .map(root -> (Gui) root);
+
+            ConnectGui firstGui = null;
+            if (rootGuiOpt.isPresent()) {
+                Gui rootGui = rootGuiOpt.get();
+                while (rootGui != null && !(rootGui instanceof ConnectGui)) {
+                    rootGui = rootGui.getPreviousGui();
+                }
+
+                if (rootGui != null) {
+                    firstGui = (ConnectGui) rootGui;
+                }
+            }
+            if (firstGui == null) {
+                firstGui = new ConnectGui();
+            }
+
+            if (reason != null) {
+                firstGui.showError(reason);
+            }
+
+            openGui(firstGui, true);
+            disconnect.set(false);
+        };
+
+        stopNetworkManagerAsync().ifPresentOrElse(f -> Platform.runLater(r), r);
+    }
+
+    private void stopNetworkManager() {
+        if (networkManager != null) {
+            NetworkManager mgr = networkManager;
+            networkManager = null;
+            mgr.stop();
+        }
+    }
+
+    private Optional<ChannelFuture> stopNetworkManagerAsync() {
+        if (networkManager != null) {
+            NetworkManager mgr = networkManager;
+            networkManager = null;
+            return mgr.stopAsync();
+        }
+
+        return Optional.empty();
     }
 }

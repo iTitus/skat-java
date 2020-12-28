@@ -10,4 +10,9 @@ module io.github.ititus.skat {
     requires javafx.graphics;
 
     exports io.github.ititus.skat;
+    exports io.github.ititus.skat.gui;
+    exports io.github.ititus.skat.network;
+    exports io.github.ititus.skat.network.buffer;
+    exports io.github.ititus.skat.network.packet;
+    exports io.github.ititus.skat.util;
 }

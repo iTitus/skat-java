@@ -22,16 +22,7 @@ public class ConnectingGui extends LoadingGui {
                 new NetworkManager(host, port,
                         () -> Platform.runLater(this::onSuccess),
                         cause -> Platform.runLater(() -> onFailure(cause)),
-                        () -> {
-                            if (!main.isExit()) {
-                                main.stopNetworkManagerAsync();
-                                Platform.runLater(() -> {
-                                    ConnectGui gui = (ConnectGui) previousGui;
-                                    gui.showError("Lost connection to server");
-                                    main.openGui(gui, true);
-                                });
-                            }
-                        }
+                        () -> Platform.runLater(() -> main.disconnect("Lost connection to server"))
                 )
         );
     }
@@ -49,12 +40,7 @@ public class ConnectingGui extends LoadingGui {
             return;
         }
 
-        getPreviousGui().showError("Connection failure: " + cause);
-        close();
-    }
-
-    private ConnectGui getPreviousGui() {
-        return (ConnectGui) previousGui;
+        main.disconnect("Connection failure: " + cause);
     }
 
     @Override
@@ -64,11 +50,6 @@ public class ConnectingGui extends LoadingGui {
         }
 
         cancel = true;
-        setLoadingText("Closing connection...");
-
-        main.stopNetworkManagerAsync().ifPresentOrElse(
-                f -> f.addListener(f_ -> Platform.runLater(super::close)),
-                super::close
-        );
+        main.disconnect("Cancelling connection");
     }
 }

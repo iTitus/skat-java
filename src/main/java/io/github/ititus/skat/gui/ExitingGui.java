@@ -1,7 +1,5 @@
 package io.github.ititus.skat.gui;
 
-import javafx.scene.input.KeyEvent;
-
 public class ExitingGui extends LoadingGui {
 
     public ExitingGui() {
@@ -9,7 +7,7 @@ public class ExitingGui extends LoadingGui {
     }
 
     @Override
-    public boolean onKeyPressed(KeyEvent event) {
+    protected boolean closeOnEsc() {
         return false;
     }
 }
