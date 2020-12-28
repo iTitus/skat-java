@@ -13,13 +13,19 @@ import static java.math.BigInteger.ZERO;
 
 public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuffer {
 
-    private static final boolean DEBUG_TYPES = true;
+    private static final boolean DEFAULT_DEBUG_TYPES = true;
     private static final BigInteger DATA_MASK = BigIntegerMath.of(0b01111111);
 
     private final ByteBuf buf;
+    private final boolean debugTypes;
 
     public PacketBufferImpl(ByteBuf buf) {
+        this(buf, DEFAULT_DEBUG_TYPES);
+    }
+
+    PacketBufferImpl(ByteBuf buf, boolean debugTypes) {
         this.buf = buf;
+        this.debugTypes = debugTypes;
     }
 
     private void checkType(Type expected) {
@@ -40,7 +46,7 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
 
     @Override
     public boolean readBoolean() {
-        if (DEBUG_TYPES) {
+        if (debugTypes) {
             checkType(Type.BOOL);
         }
 
@@ -49,7 +55,7 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
 
     @Override
     public void writeBoolean(boolean b) {
-        if (DEBUG_TYPES) {
+        if (debugTypes) {
             writeType(Type.BOOL);
         }
 
@@ -58,7 +64,7 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
 
     @Override
     public String readString() {
-        if (DEBUG_TYPES) {
+        if (debugTypes) {
             checkType(Type.STR);
         }
 
@@ -81,7 +87,11 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
 
     @Override
     public void writeString(String s) {
-        if (DEBUG_TYPES) {
+        if (s.indexOf('\0') >= 0) {
+            throw new IllegalArgumentException("string may not contain null-characters");
+        }
+
+        if (debugTypes) {
             writeType(Type.STR);
         }
 
@@ -91,7 +101,7 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
 
     @Override
     public byte readByte() {
-        if (DEBUG_TYPES) {
+        if (debugTypes) {
             checkType(Type.I8);
         }
 
@@ -100,7 +110,7 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
 
     @Override
     public short readUnsignedByte() {
-        if (DEBUG_TYPES) {
+        if (debugTypes) {
             checkType(Type.U8);
         }
 
@@ -109,7 +119,7 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
 
     @Override
     public void writeByte(byte n) {
-        if (DEBUG_TYPES) {
+        if (debugTypes) {
             writeType(Type.I8);
         }
 
@@ -118,7 +128,7 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
 
     @Override
     public void writeUnsignedByte(short n) {
-        if (DEBUG_TYPES) {
+        if (debugTypes) {
             writeType(Type.U8);
         }
 
@@ -130,7 +140,7 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
             throw new IllegalArgumentException("given type " + type + " is not a var int type");
         }
 
-        if (DEBUG_TYPES) {
+        if (debugTypes) {
             checkType(type);
         }
 
@@ -162,7 +172,7 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
             throw new IllegalArgumentException("given var int type is unsigned, but the given integer is negative");
         }
 
-        if (DEBUG_TYPES) {
+        if (debugTypes) {
             writeType(type);
         }
 
@@ -258,7 +268,7 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
 
         buf.markReaderIndex();
         buf.readerIndex(0);
-        if (DEBUG_TYPES) {
+        if (debugTypes) {
             while (buf.isReadable()) {
                 Type type = Type.fromId(buf.getByte(buf.readerIndex()));
                 b.append(' ').append(type.toString(this));
@@ -319,7 +329,7 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
                 case 10:
                     return STR;
                 default:
-                    throw new IllegalArgumentException("unknown type id");
+                    throw new IllegalArgumentException("unknown type id " + id);
             }
         }
 
@@ -333,13 +343,15 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
 
         boolean isVarInt() {
             switch (this) {
-                case I8:
-                case U8:
-                case BOOL:
-                case STR:
-                    return false;
-                default:
+                case VAR_I16:
+                case VAR_I32:
+                case VAR_I64:
+                case VAR_U16:
+                case VAR_U32:
+                case VAR_U64:
                     return true;
+                default:
+                    return false;
             }
         }
 
@@ -358,7 +370,7 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
                 case VAR_U64:
                     return 64;
                 default:
-                    throw new RuntimeException("type is not an integer");
+                    throw new RuntimeException(this + " is not an integer type");
             }
         }
 
@@ -375,7 +387,7 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
                 case VAR_U64:
                     return true;
                 default:
-                    throw new RuntimeException("type is not an integer");
+                    throw new RuntimeException(this + " is not an integer type");
             }
         }
     }
