@@ -11,9 +11,11 @@ import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
 import io.netty.util.AttributeKey;
 import io.netty.util.concurrent.DefaultThreadFactory;
+import javafx.application.Platform;
 
 import java.net.InetSocketAddress;
 import java.util.Optional;
+import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 public class NetworkManager extends SimpleChannelInboundHandler<Packet> {
@@ -23,6 +25,7 @@ public class NetworkManager extends SimpleChannelInboundHandler<Packet> {
     private final InetSocketAddress socketAddress;
     private final NetworkProtocol protocol;
     private final Runnable connectionEstablishedListener;
+    private final EventLoopGroup eventLoopGroup;
     private final ChannelFuture channelFuture;
     private final Runnable disconnectListener;
 
@@ -33,9 +36,9 @@ public class NetworkManager extends SimpleChannelInboundHandler<Packet> {
         this.connectionEstablishedListener = connectionEstablishedListener;
         this.disconnectListener = disconnectListener;
 
-        EventLoopGroup group = new NioEventLoopGroup(0, new DefaultThreadFactory("Netty Event Loop Thread #", true));
+        this.eventLoopGroup = new NioEventLoopGroup(0, new DefaultThreadFactory("Netty Event Loop Thread #", true));
         this.channelFuture = new Bootstrap()
-                .group(group)
+                .group(this.eventLoopGroup)
                 .channel(NioSocketChannel.class)
                 .option(ChannelOption.TCP_NODELAY, true)
                 .remoteAddress(this.socketAddress)
@@ -82,6 +85,14 @@ public class NetworkManager extends SimpleChannelInboundHandler<Packet> {
     protected void channelRead0(ChannelHandlerContext ctx, Packet p) {
         System.out.println("NetworkManager.channelRead0: p=" + p);
 
+        Executors.newFixedThreadPool(1).submit(() -> {
+            // add card to middle
+
+            Platform.runLater(() -> {
+                // start play card animation
+            });
+        });
+
         if (p instanceof TestPacket) {
             System.out.println("  content=" + ((TestPacket) p).getContent());
         }
@@ -105,6 +116,7 @@ public class NetworkManager extends SimpleChannelInboundHandler<Packet> {
         }
 
         channelFuture.channel().close();
+        eventLoopGroup.shutdownGracefully();
         return Optional.of(channelFuture.channel().closeFuture());
     }
 

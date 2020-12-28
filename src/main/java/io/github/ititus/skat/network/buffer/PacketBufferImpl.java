@@ -3,6 +3,8 @@ package io.github.ititus.skat.network.buffer;
 import io.github.ititus.math.number.BigIntegerMath;
 import io.github.ititus.skat.util.MathUtil;
 import io.netty.buffer.ByteBuf;
+import it.unimi.dsi.fastutil.bytes.ByteArrayList;
+import it.unimi.dsi.fastutil.bytes.ByteList;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -17,6 +19,7 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
     private static final BigInteger DATA_MASK = BigIntegerMath.of(0b01111111);
 
     private final ByteBuf buf;
+    private final int startReaderIndex;
     private final boolean debugTypes;
 
     public PacketBufferImpl(ByteBuf buf) {
@@ -25,6 +28,7 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
 
     PacketBufferImpl(ByteBuf buf, boolean debugTypes) {
         this.buf = buf;
+        this.startReaderIndex = buf.readerIndex();
         this.debugTypes = debugTypes;
     }
 
@@ -68,21 +72,17 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
             checkType(Type.STR);
         }
 
-        buf.markReaderIndex();
-        int len = 0;
-        while (buf.readByte() != 0) {
-            len++;
+        ByteList byteList = new ByteArrayList();
+        while (true) {
+            byte b = buf.readByte();
+            if (b == 0) {
+                break;
+            }
+
+            byteList.add(b);
         }
 
-        buf.resetReaderIndex();
-
-        byte[] bytes = new byte[len];
-        buf.readBytes(bytes);
-
-        String str = new String(bytes, StandardCharsets.UTF_8);
-
-        buf.readByte();
-        return str;
+        return new String(byteList.toByteArray(), StandardCharsets.UTF_8);
     }
 
     @Override
@@ -266,8 +266,8 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
         }
         b.append("]:");
 
-        buf.markReaderIndex();
-        buf.readerIndex(0);
+        int currentIndex = buf.readerIndex();
+        buf.readerIndex(startReaderIndex);
         if (debugTypes) {
             while (buf.isReadable()) {
                 Type type = Type.fromId(buf.getByte(buf.readerIndex()));
@@ -278,7 +278,7 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
                 b.append(String.format(" %02x", buf.readUnsignedByte()));
             }
         }
-        buf.resetReaderIndex();
+        buf.readerIndex(currentIndex);
 
         return b.toString();
     }
