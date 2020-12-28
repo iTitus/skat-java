@@ -50,9 +50,9 @@ javafx {
     modules = ['javafx.base', 'javafx.controls', 'javafx.graphics', 'javafx.fxml']
 }
 
-/*jlink {
+jlink {
     options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
     launcher {
         name = 'skat'
     }
-}*/
+}

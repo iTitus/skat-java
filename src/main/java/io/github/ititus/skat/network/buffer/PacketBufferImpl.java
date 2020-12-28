@@ -25,7 +25,7 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
     private void checkType(Type expected) {
         Type actual = Type.fromId(buf.readByte());
         if (actual != expected) {
-            throw new RuntimeException();
+            throw new RuntimeException("expected type " + expected + " but got " + actual);
         }
     }
 
@@ -127,7 +127,7 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
 
     private BigInteger readVarInt(Type type) {
         if (!type.isVarInt()) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("given type " + type + " is not a var int type");
         }
 
         if (DEBUG_TYPES) {
@@ -157,9 +157,9 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
 
     private void writeVarInt(Type type, BigInteger n) {
         if (!type.isVarInt()) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("given type " + type + " is not a var int type");
         } else if (type.isUnsigned() && n.signum() < 0) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("given var int type is unsigned, but the given integer is negative");
         }
 
         if (DEBUG_TYPES) {
@@ -170,7 +170,7 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
 
         int usableBits = type.isUnsigned() ? bits : bits - 1;
         if (n.bitLength() > usableBits) {
-            throw new RuntimeException();
+            throw new RuntimeException("number too big");
         }
 
         BigInteger zigzag = n.shiftRight(bits - 1).xor(n.shiftLeft(1));
@@ -319,7 +319,7 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
                 case 10:
                     return STR;
                 default:
-                    throw new IllegalArgumentException();
+                    throw new IllegalArgumentException("unknown type id");
             }
         }
 
@@ -358,7 +358,7 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
                 case VAR_U64:
                     return 64;
                 default:
-                    throw new RuntimeException();
+                    throw new RuntimeException("type is not an integer");
             }
         }
 
@@ -375,7 +375,7 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
                 case VAR_U64:
                     return true;
                 default:
-                    throw new RuntimeException();
+                    throw new RuntimeException("type is not an integer");
             }
         }
     }

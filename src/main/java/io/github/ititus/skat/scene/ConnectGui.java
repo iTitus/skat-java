@@ -6,11 +6,13 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
 public class ConnectGui extends Gui {
 
     private final TextField hostField, portField;
+    private final Text errorText;
 
     public ConnectGui() {
         Text label1 = new Text("Host");
@@ -27,9 +29,7 @@ public class ConnectGui extends Gui {
 
         Button connectButton = new Button("Connect");
         connectButton.setDefaultButton(true);
-        Button testButton = new Button("Test");
-        testButton.setOnAction(event -> main.openGui(new TestGui(1)));
-        HBox buttonBox = new HBox(10, testButton, connectButton);
+        HBox buttonBox = new HBox(10, connectButton);
         buttonBox.setAlignment(Pos.CENTER);
 
         VBox vb = new VBox(20, inputBox1, inputBox2, buttonBox);
@@ -38,12 +38,24 @@ public class ConnectGui extends Gui {
         setMargin(vb, new Insets(20));
         setCenter(vb);
 
+        errorText = new Text();
+        errorText.setFill(Color.RED);
+        errorText.setVisible(false);
+
+        HBox hb = new HBox(errorText);
+        hb.setAlignment(Pos.CENTER);
+
+        setMargin(hb, new Insets(10));
+        setBottom(hb);
+
         sceneProperty().addListener((observable, oldValue, newValue) -> connectButton.requestFocus());
 
         connectButton.setOnAction(event -> connect());
     }
 
     private void connect() {
+        hideError();
+
         String host = hostField.getText();
         int port;
         try {
@@ -58,10 +70,15 @@ public class ConnectGui extends Gui {
             return;
         }
 
-        main.connect(host, port);
+        main.openGui(new ConnectingGui(host, port));
     }
 
-    private void showError(String error) {
-        System.out.println("ERROR: " + error);
+    public void hideError() {
+        errorText.setVisible(false);
+    }
+
+    public void showError(String error) {
+        errorText.setText(error);
+        errorText.setVisible(true);
     }
 }

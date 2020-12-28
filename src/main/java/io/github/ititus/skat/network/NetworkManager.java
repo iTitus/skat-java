@@ -10,9 +10,11 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
 import io.netty.util.AttributeKey;
-import io.netty.util.concurrent.Future;
+import io.netty.util.concurrent.DefaultThreadFactory;
 
 import java.net.InetSocketAddress;
+import java.util.Optional;
+import java.util.function.Consumer;
 
 public class NetworkManager extends SimpleChannelInboundHandler<Packet> {
 
@@ -21,16 +23,19 @@ public class NetworkManager extends SimpleChannelInboundHandler<Packet> {
     private final InetSocketAddress socketAddress;
     private final NetworkProtocol protocol;
     private final Runnable connectionEstablishedListener;
-    private final EventLoopGroup eventLoopGroup;
     private final ChannelFuture channelFuture;
+    private final Runnable disconnectListener;
 
-    public NetworkManager(String host, int port, Runnable connectionEstablishedListener) {
+    public NetworkManager(String host, int port, Runnable connectionEstablishedListener,
+                          Consumer<Throwable> connectionFailedListener, Runnable disconnectListener) {
         this.socketAddress = InetSocketAddress.createUnresolved(host, port);
         this.protocol = new NetworkProtocol();
         this.connectionEstablishedListener = connectionEstablishedListener;
-        this.eventLoopGroup = new NioEventLoopGroup();
+        this.disconnectListener = disconnectListener;
+
+        EventLoopGroup group = new NioEventLoopGroup(0, new DefaultThreadFactory("Netty Event Loop Thread #", true));
         this.channelFuture = new Bootstrap()
-                .group(this.eventLoopGroup)
+                .group(group)
                 .channel(NioSocketChannel.class)
                 .option(ChannelOption.TCP_NODELAY, true)
                 .remoteAddress(this.socketAddress)
@@ -48,6 +53,12 @@ public class NetworkManager extends SimpleChannelInboundHandler<Packet> {
                     }
                 })
                 .connect();
+
+        this.channelFuture.addListener(f -> {
+            if (!f.isSuccess()) {
+                connectionFailedListener.accept(f.cause());
+            }
+        });
     }
 
     @Override
@@ -57,8 +68,14 @@ public class NetworkManager extends SimpleChannelInboundHandler<Packet> {
         ctx.channel().attr(PROTOCOL).set(protocol);
 
         connectionEstablishedListener.run();
+        ctx.channel().closeFuture().addListener(f -> disconnectListener.run());
+    }
 
-        ctx.writeAndFlush(new TestPacket());
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) {
+        System.out.println("NetworkManager.channelInactive");
+
+        stop();
     }
 
     @Override
@@ -75,14 +92,40 @@ public class NetworkManager extends SimpleChannelInboundHandler<Packet> {
         System.out.println("NetworkManager.exceptionCaught");
 
         cause.printStackTrace();
-        ctx.close();
+        stop();
     }
 
-    public void stop() throws Exception {
-        ChannelFuture close = channelFuture.channel().closeFuture();
-        Future<?> shutdown = eventLoopGroup.shutdownGracefully();
+    public void stop() {
+        stopAsync().ifPresent(ChannelFuture::awaitUninterruptibly);
+    }
 
-        close.sync();
-        shutdown.sync();
+    public Optional<ChannelFuture> stopAsync() {
+        if (!isChannelOpen()) {
+            return Optional.empty();
+        }
+
+        channelFuture.channel().close();
+        return Optional.of(channelFuture.channel().closeFuture());
+    }
+
+    public boolean isChannelOpen() {
+        return channelFuture.channel().isOpen();
+    }
+
+    public void sendPacket(Packet p) {
+        if (!isChannelOpen()) {
+            throw new IllegalStateException("channel is closed");
+        }
+
+        Runnable sender = () -> {
+            ChannelFuture f = channelFuture.channel().writeAndFlush(p);
+            f.addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
+        };
+
+        if (channelFuture.channel().eventLoop().inEventLoop()) {
+            sender.run();
+        } else {
+            channelFuture.channel().eventLoop().execute(sender);
+        }
     }
 }

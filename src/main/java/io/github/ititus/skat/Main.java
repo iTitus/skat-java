@@ -2,18 +2,22 @@ package io.github.ititus.skat;
 
 import io.github.ititus.skat.network.NetworkManager;
 import io.github.ititus.skat.scene.ConnectGui;
+import io.github.ititus.skat.scene.ExitingGui;
 import io.github.ititus.skat.scene.Gui;
-import io.github.ititus.skat.scene.JoinGui;
-import io.github.ititus.skat.scene.LoadingGui;
+import io.netty.channel.ChannelFuture;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 public class Main extends Application {
 
     private Stage stage;
+    private final AtomicBoolean exit = new AtomicBoolean(false);
     private NetworkManager networkManager;
 
     public static void main(String[] args) {
@@ -31,10 +35,27 @@ public class Main extends Application {
     }
 
     @Override
-    public void stop() throws Exception {
+    public void stop() {
+        exit.set(true);
+        stopNetworkManager();
+    }
+
+    public void stopNetworkManager() {
         if (networkManager != null) {
-            networkManager.stop();
+            NetworkManager mgr = networkManager;
+            networkManager = null;
+            mgr.stop();
         }
+    }
+
+    public Optional<ChannelFuture> stopNetworkManagerAsync() {
+        if (networkManager != null) {
+            NetworkManager mgr = networkManager;
+            networkManager = null;
+            return mgr.stopAsync();
+        }
+
+        return Optional.empty();
     }
 
     public void openGui(Gui gui) {
@@ -52,13 +73,22 @@ public class Main extends Application {
         Scene scene = stage.getScene();
         if (scene == null) {
             scene = new Scene(gui);
+            scene.setOnKeyPressed(event -> Optional.ofNullable(stage)
+                    .map(Stage::getScene)
+                    .map(Scene::getRoot)
+                    .filter(root -> root instanceof Gui)
+                    .map(root -> (Gui) root)
+                    .map(gui_ -> gui_.onKeyPressed(event))
+                    .filter(Boolean::booleanValue)
+                    .ifPresent(b -> event.consume())
+            );
             stage.setScene(scene);
         } else {
             Parent oldRoot = scene.getRoot();
             if (oldRoot instanceof Gui) {
                 Gui oldGui = (Gui) oldRoot;
                 if (!replace) {
-                    gui.setPreviousGui(oldGui);
+                    gui.setPreviousGui(oldGui.getGuiForPrevious());
                 }
             }
 
@@ -67,9 +97,11 @@ public class Main extends Application {
 
         stage.sizeToScene();
         stage.setResizable(gui.isResizable());
+        gui.onOpen();
     }
 
     public void exit() {
+        openGui(new ExitingGui());
         Platform.exit();
     }
 
@@ -77,13 +109,19 @@ public class Main extends Application {
         return stage;
     }
 
+    public boolean isExit() {
+        return exit.get();
+    }
+
     public NetworkManager getNetworkManager() {
         return networkManager;
     }
 
-    public void connect(String host, int port) {
-        System.out.println("Connecting to " + host + ":" + port);
-        openGui(new LoadingGui("Connecting..."));
-        networkManager = new NetworkManager(host, port, () -> openGui(new JoinGui()));
+    public void setNetworkManager(NetworkManager networkManager) {
+        if (this.networkManager != null && networkManager != null) {
+            throw new RuntimeException("cannot change an existing NetworkManager");
+        }
+
+        this.networkManager = networkManager;
     }
 }
