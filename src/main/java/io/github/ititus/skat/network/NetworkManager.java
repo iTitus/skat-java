@@ -1,6 +1,10 @@
 package io.github.ititus.skat.network;
 
-import io.github.ititus.skat.network.packet.Packet;
+import io.github.ititus.data.pair.Pair;
+import io.github.ititus.skat.SkatClient;
+import io.github.ititus.skat.network.handler.NetHandler;
+import io.github.ititus.skat.network.packet.ClientboundPacket;
+import io.github.ititus.skat.network.packet.ServerboundPacket;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -8,24 +12,31 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
+import io.netty.util.AttributeKey;
 import io.netty.util.concurrent.DefaultThreadFactory;
+import io.netty.util.concurrent.Future;
+import io.netty.util.concurrent.GenericFutureListener;
 
 import java.net.InetSocketAddress;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-public class NetworkManager extends SimpleChannelInboundHandler<Packet> {
+public class NetworkManager extends SimpleChannelInboundHandler<ClientboundPacket> {
 
     public static final int VERSION = 4;
 
+    private static final AttributeKey<Pair<ConnectionState, NetHandler>> STATE_KEY = AttributeKey.valueOf("state");
+
+    private final SkatClient skatClient;
     private final InetSocketAddress socketAddress;
     private final Runnable connectionEstablishedListener;
     private final EventLoopGroup eventLoopGroup;
     private final ChannelFuture channelFuture;
     private final Runnable disconnectListener;
 
-    public NetworkManager(String host, int port, Runnable connectionEstablishedListener,
+    public NetworkManager(SkatClient skatClient, String host, int port, Runnable connectionEstablishedListener,
                           Consumer<Throwable> connectionFailedListener, Runnable disconnectListener) {
+        this.skatClient = skatClient;
         this.socketAddress = InetSocketAddress.createUnresolved(host, port);
         this.connectionEstablishedListener = connectionEstablishedListener;
         this.disconnectListener = disconnectListener;
@@ -58,12 +69,22 @@ public class NetworkManager extends SimpleChannelInboundHandler<Packet> {
         });
     }
 
+    public static NetHandler getNetHandler(Channel channel) {
+        return channel.attr(STATE_KEY).get().b();
+    }
+
+    public static ConnectionState getConnectionState(Channel channel) {
+        return channel.attr(STATE_KEY).get().a();
+    }
+
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
         System.out.println("NetworkManager.channelActive");
 
-        connectionEstablishedListener.run();
+        setNetHandler(ctx.channel(), ConnectionState.JOIN);
+
         ctx.channel().closeFuture().addListener(f -> disconnectListener.run());
+        connectionEstablishedListener.run();
     }
 
     @Override
@@ -74,11 +95,11 @@ public class NetworkManager extends SimpleChannelInboundHandler<Packet> {
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, Packet p) {
+    protected void channelRead0(ChannelHandlerContext ctx, ClientboundPacket p) {
         System.out.println("NetworkManager.channelRead0: p=" + p);
 
         // TODO: handle this on a different thread
-        p.handleClient();
+        p.handle(ctx);
     }
 
     @Override
@@ -107,13 +128,20 @@ public class NetworkManager extends SimpleChannelInboundHandler<Packet> {
         return channelFuture.channel().isOpen();
     }
 
-    public void sendPacket(Packet p) {
+    public void sendPacket(ServerboundPacket p) {
+        sendPacket(p, null);
+    }
+
+    public void sendPacket(ServerboundPacket p, GenericFutureListener<? extends Future<? super Void>> listener) {
         if (!isChannelOpen()) {
             throw new IllegalStateException("channel is closed");
         }
 
         Runnable sender = () -> {
             ChannelFuture f = channelFuture.channel().writeAndFlush(p);
+            if (listener != null) {
+                f.addListener(listener);
+            }
             f.addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
         };
 
@@ -122,5 +150,9 @@ public class NetworkManager extends SimpleChannelInboundHandler<Packet> {
         } else {
             channelFuture.channel().eventLoop().execute(sender);
         }
+    }
+
+    private void setNetHandler(Channel channel, ConnectionState state) {
+        channel.attr(STATE_KEY).set(Pair.of(state, state.createNetHandler(skatClient, this)));
     }
 }

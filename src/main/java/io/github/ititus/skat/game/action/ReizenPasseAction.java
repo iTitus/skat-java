@@ -1,11 +1,10 @@
 package io.github.ititus.skat.game.action;
 
-import io.github.ititus.skat.network.buffer.ReadablePacketBuffer;
 import io.github.ititus.skat.network.buffer.WritablePacketBuffer;
 
 public class ReizenPasseAction extends Action {
 
-    public ReizenPasseAction(ReadablePacketBuffer buf) {
+    public ReizenPasseAction() {
         super(Type.REIZEN_PASSE);
     }
 

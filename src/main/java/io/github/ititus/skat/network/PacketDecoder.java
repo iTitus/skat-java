@@ -2,8 +2,8 @@ package io.github.ititus.skat.network;
 
 import io.github.ititus.skat.network.buffer.PacketBufferImpl;
 import io.github.ititus.skat.network.buffer.ReadablePacketBuffer;
-import io.github.ititus.skat.network.packet.Packet;
-import io.github.ititus.skat.network.packet.PacketType;
+import io.github.ititus.skat.network.packet.ClientboundPacket;
+import io.github.ititus.skat.network.packet.ClientboundPacketType;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
@@ -21,7 +21,7 @@ public class PacketDecoder extends ByteToMessageDecoder {
         System.out.println("  Received: " + buf.dump());
 
         byte id = buf.readByte();
-        Packet p = PacketType.fromId(id).read(buf);
+        ClientboundPacket p = ClientboundPacketType.fromId(id).read(buf);
 
         if (buf.readableBytes() > 0) {
             throw new IOException("Packet " + p.getClass().getSimpleName() + " (" + id + ") was larger than expected,"

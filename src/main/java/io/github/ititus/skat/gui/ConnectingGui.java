@@ -18,11 +18,11 @@ public class ConnectingGui extends LoadingGui {
 
     @Override
     public void onOpen() {
-        main.setNetworkManager(
-                new NetworkManager(host, port,
+        skatClient.setNetworkManager(
+                new NetworkManager(skatClient, host, port,
                         () -> Platform.runLater(this::onSuccess),
                         cause -> Platform.runLater(() -> onFailure(cause)),
-                        () -> Platform.runLater(() -> main.disconnect("Lost connection to server"))
+                        () -> Platform.runLater(() -> skatClient.disconnect("Lost connection to server"))
                 )
         );
     }
@@ -32,7 +32,7 @@ public class ConnectingGui extends LoadingGui {
             return;
         }
 
-        main.openGui(new JoinGui());
+        skatClient.openGui(new JoinGui());
     }
 
     public void onFailure(Throwable cause) {
@@ -40,7 +40,7 @@ public class ConnectingGui extends LoadingGui {
             return;
         }
 
-        main.disconnect("Connection failure: " + cause);
+        skatClient.disconnect("Connection failure: " + cause);
     }
 
     @Override
@@ -50,6 +50,11 @@ public class ConnectingGui extends LoadingGui {
         }
 
         cancel = true;
-        main.disconnect("Cancelling connection");
+        skatClient.disconnect("Cancelling connection");
+    }
+
+    @Override
+    protected boolean closeOnEsc() {
+        return true;
     }
 }

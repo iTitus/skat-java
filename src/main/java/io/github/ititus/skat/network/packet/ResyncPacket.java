@@ -1,19 +1,23 @@
 package io.github.ititus.skat.network.packet;
 
+import io.github.ititus.skat.game.gamestate.NetworkGameState;
 import io.github.ititus.skat.network.buffer.ReadablePacketBuffer;
-import io.github.ititus.skat.network.buffer.WritablePacketBuffer;
+import io.netty.channel.ChannelHandlerContext;
 
-public class ResyncPacket extends Packet {
+public class ResyncPacket implements ClientboundPacket {
+
+    private final NetworkGameState gameState;
 
     public ResyncPacket(ReadablePacketBuffer buf) {
-        super(PacketType.RESYNC);
+        gameState = new NetworkGameState(buf);
     }
 
     @Override
-    public void write(WritablePacketBuffer buf) {
+    public void handle(ChannelHandlerContext ctx) {
     }
 
     @Override
-    public void handleClient() {
+    public ClientboundPacketType getClientboundType() {
+        return ClientboundPacketType.RESYNC;
     }
 }

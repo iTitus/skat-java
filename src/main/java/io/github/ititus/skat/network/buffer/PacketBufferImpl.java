@@ -111,6 +111,16 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
     }
 
     @Override
+    public byte[] readBytes(int length) {
+        byte[] bytes = new byte[length];
+        for (int i = 0; i < length; i++) {
+            bytes[i] = readByte();
+        }
+
+        return bytes;
+    }
+
+    @Override
     public short readUnsignedByte() {
         if (debugTypes) {
             checkType(Type.U8);
@@ -240,6 +250,16 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
     @Override
     public long readLong() {
         return readVarInt(Type.VAR_I64).longValue();
+    }
+
+    @Override
+    public long[] readLongs(int length) {
+        long[] longs = new long[length];
+        for (int i = 0; i < length; i++) {
+            longs[i] = readLong();
+        }
+
+        return longs;
     }
 
     @Override

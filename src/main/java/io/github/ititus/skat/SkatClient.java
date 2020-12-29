@@ -1,11 +1,14 @@
 package io.github.ititus.skat;
 
+import io.github.ititus.skat.game.Player;
+import io.github.ititus.skat.game.gamestate.GameState;
 import io.github.ititus.skat.gui.ConnectGui;
 import io.github.ititus.skat.gui.ExitingGui;
 import io.github.ititus.skat.gui.Gui;
 import io.github.ititus.skat.gui.LoadingGui;
 import io.github.ititus.skat.network.NetworkManager;
 import io.netty.channel.ChannelFuture;
+import it.unimi.dsi.fastutil.bytes.Byte2ObjectMap;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Parent;
@@ -15,12 +18,16 @@ import javafx.stage.Stage;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class Main extends Application {
+public class SkatClient extends Application {
 
     private final AtomicBoolean exit = new AtomicBoolean(false);
     private final AtomicBoolean disconnect = new AtomicBoolean(false);
+
     private Stage stage;
+
     private NetworkManager networkManager;
+    private Byte2ObjectMap<Player> players;
+    private GameState gameState;
 
     public static void main(String[] args) {
         launch(args);

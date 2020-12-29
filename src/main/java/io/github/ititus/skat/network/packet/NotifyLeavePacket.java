@@ -1,19 +1,22 @@
 package io.github.ititus.skat.network.packet;
 
 import io.github.ititus.skat.network.buffer.ReadablePacketBuffer;
-import io.github.ititus.skat.network.buffer.WritablePacketBuffer;
+import io.netty.channel.ChannelHandlerContext;
 
-public class NotifyLeavePacket extends Packet {
+public class NotifyLeavePacket implements ClientboundPacket {
+
+    private final byte gupid;
 
     public NotifyLeavePacket(ReadablePacketBuffer buf) {
-        super(PacketType.NOTIFY_LEAVE);
+        gupid = buf.readByte();
     }
 
     @Override
-    public void write(WritablePacketBuffer buf) {
+    public void handle(ChannelHandlerContext ctx) {
     }
 
     @Override
-    public void handleClient() {
+    public ClientboundPacketType getClientboundType() {
+        return ClientboundPacketType.NOTIFY_LEAVE;
     }
 }

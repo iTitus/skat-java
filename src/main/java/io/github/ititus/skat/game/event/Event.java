@@ -3,12 +3,11 @@ package io.github.ititus.skat.game.event;
 import io.github.ititus.skat.game.gamestate.GameState;
 import io.github.ititus.skat.network.NetworkEnum;
 import io.github.ititus.skat.network.buffer.PacketBufferDeserializer;
-import io.github.ititus.skat.network.buffer.PacketBufferSerializer;
 import io.github.ititus.skat.network.buffer.ReadablePacketBuffer;
 
 import java.util.Optional;
 
-public abstract class Event implements PacketBufferSerializer {
+public abstract class Event {
 
     private final Type type;
 

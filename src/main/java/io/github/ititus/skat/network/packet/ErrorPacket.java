@@ -3,18 +3,17 @@ package io.github.ititus.skat.network.packet;
 import io.github.ititus.skat.network.NetworkEnum;
 import io.github.ititus.skat.network.buffer.ReadablePacketBuffer;
 import io.github.ititus.skat.network.buffer.WritablePacketBuffer;
+import io.netty.channel.ChannelHandlerContext;
 
-public class ErrorPacket extends Packet {
+public class ErrorPacket implements ClientboundPacket, ServerboundPacket {
 
     private final ConnectionErrorType type;
 
     public ErrorPacket(ReadablePacketBuffer buf) {
-        super(PacketType.ERROR);
         type = buf.readEnum(ConnectionErrorType::fromId);
     }
 
     public ErrorPacket(ConnectionErrorType type) {
-        super(PacketType.ERROR);
         this.type = type;
     }
 
@@ -24,7 +23,17 @@ public class ErrorPacket extends Packet {
     }
 
     @Override
-    public void handleClient() {
+    public void handle(ChannelHandlerContext ctx) {
+    }
+
+    @Override
+    public ClientboundPacketType getClientboundType() {
+        return ClientboundPacketType.ERROR;
+    }
+
+    @Override
+    public ServerboundPacketType getServerboundType() {
+        return ServerboundPacketType.ERROR;
     }
 
     public enum ConnectionErrorType implements NetworkEnum<ConnectionErrorType> {

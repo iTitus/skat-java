@@ -1,19 +1,23 @@
 package io.github.ititus.skat.network.packet;
 
+import io.github.ititus.skat.game.Player;
 import io.github.ititus.skat.network.buffer.ReadablePacketBuffer;
-import io.github.ititus.skat.network.buffer.WritablePacketBuffer;
+import io.netty.channel.ChannelHandlerContext;
 
-public class NotifyJoinPacket extends Packet {
+public class NotifyJoinPacket implements ClientboundPacket {
+
+    private final Player player;
 
     public NotifyJoinPacket(ReadablePacketBuffer buf) {
-        super(PacketType.NOTIFY_JOIN);
+        player = new Player(buf);
     }
 
     @Override
-    public void write(WritablePacketBuffer buf) {
+    public void handle(ChannelHandlerContext ctx) {
     }
 
     @Override
-    public void handleClient() {
+    public ClientboundPacketType getClientboundType() {
+        return ClientboundPacketType.NOTIFY_JOIN;
     }
 }

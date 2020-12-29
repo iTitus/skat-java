@@ -1,19 +1,22 @@
 package io.github.ititus.skat.network.packet;
 
 import io.github.ititus.skat.network.buffer.ReadablePacketBuffer;
-import io.github.ititus.skat.network.buffer.WritablePacketBuffer;
+import io.netty.channel.ChannelHandlerContext;
 
-public class ConfirmJoinPacket extends Packet {
+public class ConfirmJoinPacket implements ClientboundPacket {
+
+    private final byte gupid;
 
     public ConfirmJoinPacket(ReadablePacketBuffer buf) {
-        super(PacketType.CONFIRM_JOIN);
+        gupid = buf.readByte();
     }
 
     @Override
-    public void write(WritablePacketBuffer buf) {
+    public void handle(ChannelHandlerContext ctx) {
     }
 
     @Override
-    public void handleClient() {
+    public ClientboundPacketType getClientboundType() {
+        return ClientboundPacketType.CONFIRM_JOIN;
     }
 }

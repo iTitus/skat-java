@@ -1,9 +1,7 @@
 package io.github.ititus.skat.game.action;
 
 import io.github.ititus.skat.network.NetworkEnum;
-import io.github.ititus.skat.network.buffer.PacketBufferDeserializer;
 import io.github.ititus.skat.network.buffer.PacketBufferSerializer;
-import io.github.ititus.skat.network.buffer.ReadablePacketBuffer;
 
 public abstract class Action implements PacketBufferSerializer {
 
@@ -17,38 +15,17 @@ public abstract class Action implements PacketBufferSerializer {
         return type;
     }
 
-    public enum Type implements NetworkEnum<Type>, PacketBufferDeserializer<Action> {
+    public enum Type implements NetworkEnum<Type> {
 
-        READY(ReadyAction::new),
-        REIZEN_NUMBER(ReizenNumberAction::new),
-        REIZEN_CONFIRM(ReizenConfirmAction::new),
-        REIZEN_PASSE(ReizenPasseAction::new),
-        SKAT_TAKE(SkatTakeAction::new),
-        SKAT_LEAVE(SkatLeaveAction::new),
-        SKAT_PRESS(SkatPressAction::new),
-        PLAY_CARD(PlayCardAction::new),
-        CALL_GAME(CallGameAction::new);
-
-        private final PacketBufferDeserializer<? extends Action> deserializer;
-
-        Type(PacketBufferDeserializer<? extends Action> deserializer) {
-            this.deserializer = deserializer;
-        }
-
-        public static Type fromId(byte id) {
-            Type[] values = values();
-            int ordinal = id - 1;
-            if (ordinal < 0 || ordinal >= values.length) {
-                throw new IndexOutOfBoundsException("id out of bounds");
-            }
-
-            return values[ordinal];
-        }
-
-        @Override
-        public Action read(ReadablePacketBuffer buf) {
-            return deserializer.read(buf);
-        }
+        READY,
+        REIZEN_NUMBER,
+        REIZEN_CONFIRM,
+        REIZEN_PASSE,
+        SKAT_TAKE,
+        SKAT_LEAVE,
+        SKAT_PRESS,
+        PLAY_CARD,
+        CALL_GAME;
 
         @Override
         public byte getId() {

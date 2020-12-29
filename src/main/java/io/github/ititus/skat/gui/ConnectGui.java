@@ -13,6 +13,7 @@ public class ConnectGui extends Gui {
 
     private final TextField hostField, portField;
     private final Text errorText;
+    private final Button connectButton;
 
     public ConnectGui() {
         Text label1 = new Text("Host");
@@ -27,8 +28,10 @@ public class ConnectGui extends Gui {
         HBox inputBox2 = new HBox(10, label2, portField);
         inputBox2.setAlignment(Pos.CENTER);
 
-        Button connectButton = new Button("Connect");
+        connectButton = new Button("Connect");
         connectButton.setDefaultButton(true);
+        connectButton.setOnAction(event -> connect());
+
         HBox buttonBox = new HBox(10, connectButton);
         buttonBox.setAlignment(Pos.CENTER);
 
@@ -47,10 +50,11 @@ public class ConnectGui extends Gui {
 
         setMargin(hb, new Insets(10));
         setBottom(hb);
+    }
 
-        sceneProperty().addListener((observable, oldValue, newValue) -> connectButton.requestFocus());
-
-        connectButton.setOnAction(event -> connect());
+    @Override
+    public void onOpen() {
+        connectButton.requestFocus();
     }
 
     private void connect() {
@@ -70,7 +74,7 @@ public class ConnectGui extends Gui {
             return;
         }
 
-        main.openGui(new ConnectingGui(host, port));
+        skatClient.openGui(new ConnectingGui(host, port));
     }
 
     public void hideError() {

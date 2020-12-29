@@ -1,6 +1,6 @@
 package io.github.ititus.skat.gui;
 
-import io.github.ititus.skat.Main;
+import io.github.ititus.skat.SkatClient;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyEvent;
@@ -10,7 +10,7 @@ public abstract class Gui extends BorderPane {
 
     private static final KeyCodeCombination EXIT_KEYBIND = new KeyCodeCombination(KeyCode.ESCAPE);
 
-    protected Main main;
+    protected SkatClient skatClient;
     protected Gui previousGui;
 
     protected Gui() {
@@ -18,8 +18,8 @@ public abstract class Gui extends BorderPane {
         setMinHeight(200);
     }
 
-    public void setMain(Main main) {
-        this.main = main;
+    public void setMain(SkatClient skatClient) {
+        this.skatClient = skatClient;
     }
 
     public Gui getPreviousGui() {
@@ -35,9 +35,9 @@ public abstract class Gui extends BorderPane {
 
     public void close() {
         if (previousGui != null) {
-            main.openGui(previousGui, true);
+            skatClient.openGui(previousGui, true);
         } else {
-            main.exit();
+            skatClient.exit();
         }
     }
 
@@ -46,7 +46,7 @@ public abstract class Gui extends BorderPane {
     }
 
     protected boolean closeOnEsc() {
-        return true;
+        return false;
     }
 
     public boolean onKeyPressed(KeyEvent event) {

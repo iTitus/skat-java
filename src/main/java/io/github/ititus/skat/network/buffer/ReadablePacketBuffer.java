@@ -15,6 +15,8 @@ public interface ReadablePacketBuffer extends PacketBuffer {
 
     byte readByte();
 
+    byte[] readBytes(int length);
+
     short readUnsignedByte();
 
     short readShort();
@@ -26,6 +28,8 @@ public interface ReadablePacketBuffer extends PacketBuffer {
     long readUnsignedInt();
 
     long readLong();
+
+    long[] readLongs(int length);
 
     BigInteger readUnsignedLong();
 
