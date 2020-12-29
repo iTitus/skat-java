@@ -1,8 +1,6 @@
 package io.github.ititus.skat.network;
 
-import io.github.ititus.data.pair.Pair;
 import io.github.ititus.skat.SkatClient;
-import io.github.ititus.skat.network.handler.NetHandler;
 import io.github.ititus.skat.network.packet.ClientboundPacket;
 import io.github.ititus.skat.network.packet.ServerboundPacket;
 import io.netty.bootstrap.Bootstrap;
@@ -25,7 +23,7 @@ public class NetworkManager extends SimpleChannelInboundHandler<ClientboundPacke
 
     public static final int VERSION = 4;
 
-    private static final AttributeKey<Pair<ConnectionState, NetHandler>> STATE_KEY = AttributeKey.valueOf("state");
+    public static final AttributeKey<ConnectionState> CONNECTION_STATE_KEY = AttributeKey.valueOf("state");
 
     private final SkatClient skatClient;
     private final InetSocketAddress socketAddress;
@@ -69,19 +67,11 @@ public class NetworkManager extends SimpleChannelInboundHandler<ClientboundPacke
         });
     }
 
-    public static NetHandler getNetHandler(Channel channel) {
-        return channel.attr(STATE_KEY).get().b();
-    }
-
-    public static ConnectionState getConnectionState(Channel channel) {
-        return channel.attr(STATE_KEY).get().a();
-    }
-
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
         System.out.println("NetworkManager.channelActive");
 
-        setNetHandler(ctx.channel(), ConnectionState.JOIN);
+        setConnectionState(ConnectionState.JOIN);
 
         ctx.channel().closeFuture().addListener(f -> disconnectListener.run());
         connectionEstablishedListener.run();
@@ -98,8 +88,7 @@ public class NetworkManager extends SimpleChannelInboundHandler<ClientboundPacke
     protected void channelRead0(ChannelHandlerContext ctx, ClientboundPacket p) {
         System.out.println("NetworkManager.channelRead0: p=" + p);
 
-        // TODO: handle this on a different thread
-        p.handle(ctx);
+        p.handle(ctx, skatClient);
     }
 
     @Override
@@ -107,7 +96,7 @@ public class NetworkManager extends SimpleChannelInboundHandler<ClientboundPacke
         System.out.println("NetworkManager.exceptionCaught");
 
         cause.printStackTrace();
-        stop();
+        skatClient.disconnect("Error: " + cause);
     }
 
     public void stop() {
@@ -125,7 +114,7 @@ public class NetworkManager extends SimpleChannelInboundHandler<ClientboundPacke
     }
 
     public boolean isChannelOpen() {
-        return channelFuture.channel().isOpen();
+        return channelFuture.isSuccess() && channelFuture.channel().isOpen();
     }
 
     public void sendPacket(ServerboundPacket p) {
@@ -137,22 +126,24 @@ public class NetworkManager extends SimpleChannelInboundHandler<ClientboundPacke
             throw new IllegalStateException("channel is closed");
         }
 
-        Runnable sender = () -> {
+        executeTask(() -> {
             ChannelFuture f = channelFuture.channel().writeAndFlush(p);
             if (listener != null) {
                 f.addListener(listener);
             }
             f.addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
-        };
+        });
+    }
 
+    public void executeTask(Runnable task) {
         if (channelFuture.channel().eventLoop().inEventLoop()) {
-            sender.run();
+            task.run();
         } else {
-            channelFuture.channel().eventLoop().execute(sender);
+            channelFuture.channel().eventLoop().execute(task);
         }
     }
 
-    private void setNetHandler(Channel channel, ConnectionState state) {
-        channel.attr(STATE_KEY).set(Pair.of(state, state.createNetHandler(skatClient, this)));
+    public void setConnectionState(ConnectionState state) {
+        channelFuture.channel().attr(CONNECTION_STATE_KEY).set(state);
     }
 }

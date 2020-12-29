@@ -2,19 +2,19 @@ package io.github.ititus.skat.game.gamestate;
 
 import io.github.ititus.skat.SkatClient;
 import io.github.ititus.skat.game.card.CardCollection;
-import io.github.ititus.skat.game.card.Stich;
+import io.github.ititus.skat.game.card.NetworkStich;
 import io.github.ititus.skat.network.buffer.ReadablePacketBuffer;
 
 public class NetworkGameState {
 
     private final GamePhase phase;
-    private final ReizState reizState;
+    private final NetworkReizState reizState;
     private final GameRules rules;
     private final byte[] activePlayers;
     private final ScoreBoard scoreBoard;
-    private final Stich currentStich;
-    private final Stich lastStich;
-    private final byte stichNum;
+    private final NetworkStich currentStich;
+    private final NetworkStich lastStich;
+    private final short stichNum;
     private final byte alleinspieler;
     private final boolean tookSkat;
     private final CardCollection hand;
@@ -25,13 +25,13 @@ public class NetworkGameState {
 
     public NetworkGameState(ReadablePacketBuffer buf) {
         phase = buf.readEnum(GamePhase::fromId);
-        reizState = new ReizState(buf);
+        reizState = new NetworkReizState(buf);
         rules = new GameRules(buf);
         activePlayers = buf.readBytes(3);
         scoreBoard = ScoreBoard.read(buf);
-        currentStich = new Stich(buf);
-        lastStich = new Stich(buf);
-        stichNum = buf.readByte();
+        currentStich = new NetworkStich(buf);
+        lastStich = new NetworkStich(buf);
+        stichNum = buf.readUnsignedByte();
         alleinspieler = buf.readByte();
         tookSkat = buf.readBoolean();
         hand = CardCollection.read(buf);

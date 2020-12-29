@@ -2,13 +2,13 @@ package io.github.ititus.skat;
 
 import io.github.ititus.skat.game.Player;
 import io.github.ititus.skat.game.gamestate.GameState;
-import io.github.ititus.skat.gui.ConnectGui;
-import io.github.ititus.skat.gui.ExitingGui;
-import io.github.ititus.skat.gui.Gui;
-import io.github.ititus.skat.gui.LoadingGui;
+import io.github.ititus.skat.gui.*;
+import io.github.ititus.skat.network.ConnectionState;
 import io.github.ititus.skat.network.NetworkManager;
+import io.github.ititus.skat.network.packet.ConfirmResyncPacket;
 import io.netty.channel.ChannelFuture;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectMap;
+import it.unimi.dsi.fastutil.bytes.Byte2ObjectOpenHashMap;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Parent;
@@ -22,12 +22,11 @@ public class SkatClient extends Application {
 
     private final AtomicBoolean exit = new AtomicBoolean(false);
     private final AtomicBoolean disconnect = new AtomicBoolean(false);
-
+    private final Byte2ObjectMap<Player> players = new Byte2ObjectOpenHashMap<>();
     private Stage stage;
-
     private NetworkManager networkManager;
-    private Byte2ObjectMap<Player> players;
     private GameState gameState;
+    private Player player;
 
     public static void main(String[] args) {
         launch(args);
@@ -59,7 +58,7 @@ public class SkatClient extends Application {
             return;
         }
 
-        gui.setMain(this);
+        gui.setSkatClient(this);
 
         Scene scene = stage.getScene();
         if (scene == null) {
@@ -121,11 +120,7 @@ public class SkatClient extends Application {
         openGui(new LoadingGui("Closing connection..."));
 
         Runnable r = () -> {
-            Optional<Gui> rootGuiOpt = Optional.ofNullable(stage)
-                    .map(Stage::getScene)
-                    .map(Scene::getRoot)
-                    .filter(root -> root instanceof Gui)
-                    .map(root -> (Gui) root);
+            Optional<Gui> rootGuiOpt = getCurrentGui();
 
             ConnectGui firstGui = null;
             if (rootGuiOpt.isPresent()) {
@@ -169,5 +164,40 @@ public class SkatClient extends Application {
         }
 
         return Optional.empty();
+    }
+
+    public Optional<Gui> getCurrentGui() {
+        return Optional.ofNullable(stage)
+                .map(Stage::getScene)
+                .map(Scene::getRoot)
+                .filter(root -> root instanceof Gui)
+                .map(root -> (Gui) root);
+    }
+
+    public void setup(byte gupid, String name) {
+        player = new Player(gupid, name);
+
+        players.clear();
+        players.put(gupid, player);
+    }
+
+    public void startResync() {
+        networkManager.setConnectionState(ConnectionState.RESYNC);
+        openGui(new ResyncGui());
+    }
+
+    public void resync(GameState gameState, Byte2ObjectMap<Player> players) {
+        this.gameState = gameState;
+
+        this.players.clear();
+        this.players.putAll(players);
+
+        this.player = this.players.get(this.player.getGupid());
+
+        networkManager.sendPacket(new ConfirmResyncPacket(),
+                f -> {
+                    networkManager.setConnectionState(ConnectionState.INGAME);
+                    openGui(new IngameGui());
+                });
     }
 }

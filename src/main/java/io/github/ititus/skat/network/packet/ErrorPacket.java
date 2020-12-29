@@ -1,5 +1,6 @@
 package io.github.ititus.skat.network.packet;
 
+import io.github.ititus.skat.SkatClient;
 import io.github.ititus.skat.network.NetworkEnum;
 import io.github.ititus.skat.network.buffer.ReadablePacketBuffer;
 import io.github.ititus.skat.network.buffer.WritablePacketBuffer;
@@ -23,7 +24,8 @@ public class ErrorPacket implements ClientboundPacket, ServerboundPacket {
     }
 
     @Override
-    public void handle(ChannelHandlerContext ctx) {
+    public void handle(ChannelHandlerContext ctx, SkatClient skatClient) {
+        skatClient.disconnect("Error: " + type);
     }
 
     @Override

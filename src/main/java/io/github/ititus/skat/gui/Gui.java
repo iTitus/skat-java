@@ -18,7 +18,7 @@ public abstract class Gui extends BorderPane {
         setMinHeight(200);
     }
 
-    public void setMain(SkatClient skatClient) {
+    public void setSkatClient(SkatClient skatClient) {
         this.skatClient = skatClient;
     }
 

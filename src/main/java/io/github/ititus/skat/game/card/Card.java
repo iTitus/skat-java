@@ -2,11 +2,11 @@ package io.github.ititus.skat.game.card;
 
 import io.github.ititus.skat.game.gamestate.GameRules;
 import io.github.ititus.skat.network.NetworkEnum;
+import io.github.ititus.skat.network.buffer.ReadablePacketBuffer;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectMap;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectOpenHashMap;
 
 import java.util.Comparator;
-import java.util.NoSuchElementException;
 
 import static io.github.ititus.skat.game.card.CardColor.*;
 import static io.github.ititus.skat.game.card.CardType.*;
@@ -73,11 +73,20 @@ public enum Card implements NetworkEnum<Card> {
         this.type = type;
     }
 
+    public static Card read(ReadablePacketBuffer buf) {
+        short id = buf.readUnsignedByte();
+        if (id > Byte.MAX_VALUE) {
+            throw new IndexOutOfBoundsException("id too big");
+        }
+
+        return fromId((byte) id);
+    }
+
     public static Card fromId(byte id) {
         Card c = ID_MAP.get(id);
-        if (c == null) {
+        /*if (c == null) {
             throw new NoSuchElementException("unknown card id " + id);
-        }
+        }*/
 
         return c;
     }

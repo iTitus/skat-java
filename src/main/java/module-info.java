@@ -10,9 +10,15 @@ module io.github.ititus.skat {
     requires javafx.graphics;
 
     exports io.github.ititus.skat;
+    exports io.github.ititus.skat.game;
+    exports io.github.ititus.skat.game.action;
+    exports io.github.ititus.skat.game.card;
+    exports io.github.ititus.skat.game.event;
+    exports io.github.ititus.skat.game.gamestate;
     exports io.github.ititus.skat.gui;
     exports io.github.ititus.skat.network;
     exports io.github.ititus.skat.network.buffer;
+    exports io.github.ititus.skat.network.handler;
     exports io.github.ititus.skat.network.packet;
     exports io.github.ititus.skat.util;
 }

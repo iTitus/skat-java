@@ -1,5 +1,6 @@
 package io.github.ititus.skat.network.packet;
 
+import io.github.ititus.skat.SkatClient;
 import io.github.ititus.skat.game.Player;
 import io.github.ititus.skat.network.buffer.ReadablePacketBuffer;
 import io.netty.channel.ChannelHandlerContext;
@@ -13,7 +14,7 @@ public class NotifyJoinPacket implements ClientboundPacket {
     }
 
     @Override
-    public void handle(ChannelHandlerContext ctx) {
+    public void handle(ChannelHandlerContext ctx, SkatClient skatClient) {
     }
 
     @Override

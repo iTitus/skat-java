@@ -16,10 +16,36 @@ public final class Player implements PacketBufferSerializer {
         name = buf.readString();
     }
 
+    public Player(byte gupid, String name) {
+        this(gupid, (byte) -1, name);
+    }
+
+    public Player(byte gupid, byte activePlayerIndex, String name) {
+        this.gupid = gupid;
+        this.activePlayerIndex = activePlayerIndex;
+        this.name = name;
+    }
+
     @Override
     public void write(WritablePacketBuffer buf) {
         buf.writeByte(gupid);
         buf.writeByte(activePlayerIndex);
         buf.writeString(name);
+    }
+
+    public byte getGupid() {
+        return gupid;
+    }
+
+    public byte getActivePlayerIndex() {
+        return activePlayerIndex;
+    }
+
+    public boolean isPlaying() {
+        return activePlayerIndex >= 0;
+    }
+
+    public String getName() {
+        return name;
     }
 }
