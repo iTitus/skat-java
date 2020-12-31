@@ -7,8 +7,11 @@ import java.util.Optional;
 
 public class ReizenDoneEvent extends Event {
 
+    private final byte alleinspieler;
+
     public ReizenDoneEvent(ReadablePacketBuffer buf) {
-        super(Type.REIZEN_DONE);
+        super(Type.REIZEN_DONE, buf);
+        alleinspieler = buf.readByte();
     }
 
     @Override

@@ -15,6 +15,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -199,5 +200,18 @@ public class SkatClient extends Application {
                     networkManager.setConnectionState(ConnectionState.INGAME);
                     openGui(new IngameGui());
                 });
+    }
+
+    public Player getPlayer(byte gupid) {
+        if (gupid == -1) {
+            return null;
+        }
+
+        Player player = players.get(gupid);
+        if (player == null) {
+            throw new NoSuchElementException("unknown player gupid");
+        }
+
+        return player;
     }
 }

@@ -1,5 +1,6 @@
 package io.github.ititus.skat.game.gamestate;
 
+import io.github.ititus.skat.SkatClient;
 import io.github.ititus.skat.network.buffer.ReadablePacketBuffer;
 
 public final class NetworkReizState {
@@ -17,5 +18,9 @@ public final class NetworkReizState {
         waitingForTeller = buf.readBoolean();
         reizwert = buf.readUnsignedShort();
         winner = buf.readByte();
+    }
+
+    public ReizState get(SkatClient skatClient) {
+        return null;
     }
 }

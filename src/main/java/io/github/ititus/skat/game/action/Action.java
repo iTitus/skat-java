@@ -2,17 +2,26 @@ package io.github.ititus.skat.game.action;
 
 import io.github.ititus.skat.network.NetworkEnum;
 import io.github.ititus.skat.network.buffer.PacketBufferSerializer;
+import io.github.ititus.skat.network.buffer.WritablePacketBuffer;
 
 public abstract class Action implements PacketBufferSerializer {
 
     private final Type type;
+    private final long id;
 
-    protected Action(Type type) {
+    protected Action(Type type, long id) {
         this.type = type;
+        this.id = id;
     }
 
     public Type getType() {
         return type;
+    }
+
+    @Override
+    public void write(WritablePacketBuffer buf) {
+        buf.writeEnum(type);
+        buf.writeLong(id);
     }
 
     public enum Type implements NetworkEnum<Type> {

@@ -7,8 +7,11 @@ import java.util.Optional;
 
 public class StartRoundEvent extends Event {
 
+    private final byte[] activePlayers;
+
     public StartRoundEvent(ReadablePacketBuffer buf) {
-        super(Type.START_ROUND);
+        super(Type.START_ROUND, buf);
+        activePlayers = buf.readBytes(3);
     }
 
     @Override

@@ -8,7 +8,7 @@ import java.util.Optional;
 public class ReizenPasseEvent extends Event {
 
     public ReizenPasseEvent(ReadablePacketBuffer buf) {
-        super(Type.REIZEN_CONFIRM);
+        super(Type.REIZEN_CONFIRM, buf);
     }
 
     @Override

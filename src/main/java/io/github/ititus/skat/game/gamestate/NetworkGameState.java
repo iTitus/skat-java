@@ -10,6 +10,9 @@ public class NetworkGameState {
     private final GamePhase phase;
     private final NetworkReizState reizState;
     private final GameRules rules;
+    /**
+     * map active player -> gupid
+     */
     private final byte[] activePlayers;
     private final ScoreBoard scoreBoard;
     private final NetworkStich currentStich;

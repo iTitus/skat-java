@@ -23,6 +23,7 @@ public final class ReizState {
 
     public enum Phase implements NetworkEnum<Phase> {
 
+        INVALID,
         MITTELHAND_TO_VORHAND,
         HINTERHAND_TO_WINNER,
         WINNER,
@@ -30,20 +31,17 @@ public final class ReizState {
 
         public static Phase fromId(byte id) {
             Phase[] values = values();
-            int ordinal = id - 1;
-            if (ordinal == -1) {
-                return null;
-            } else if (ordinal < 0 || ordinal >= values.length) {
+            if (id < 0 || id >= values.length) {
                 throw new IndexOutOfBoundsException("id out of bounds");
             }
 
-            return values[ordinal];
+            return values[id];
         }
 
         @Override
         public byte getId() {
-            int id = ordinal() + 1;
-            if (id < 0 || id > Byte.MAX_VALUE) {
+            int id = ordinal();
+            if (id > Byte.MAX_VALUE) {
                 throw new IndexOutOfBoundsException("ordinal out of bounds");
             }
 

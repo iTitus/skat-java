@@ -1,6 +1,5 @@
 package io.github.ititus.skat.network.buffer;
 
-import io.github.ititus.math.number.BigIntegerMath;
 import io.github.ititus.skat.network.NetworkEnum;
 import io.github.ititus.skat.util.MathUtil;
 import io.netty.buffer.ByteBuf;
@@ -10,15 +9,14 @@ import it.unimi.dsi.fastutil.bytes.ByteList;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 import java.util.function.Function;
 
-import static java.math.BigInteger.ONE;
-import static java.math.BigInteger.ZERO;
+import static io.github.ititus.skat.util.MathUtil.*;
 
 public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuffer {
 
     private static final boolean DEFAULT_DEBUG_TYPES = true;
-    private static final BigInteger DATA_MASK = BigIntegerMath.of(0b01111111);
 
     private final ByteBuf buf;
     private final int startReaderIndex;
@@ -130,6 +128,16 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
     }
 
     @Override
+    public short[] readUnsignedBytes(int length) {
+        short[] bytes = new short[length];
+        for (int i = 0; i < length; i++) {
+            bytes[i] = readUnsignedByte();
+        }
+
+        return bytes;
+    }
+
+    @Override
     public void writeByte(byte n) {
         if (debugTypes) {
             writeType(Type.I8);
@@ -140,14 +148,16 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
 
     @Override
     public void writeUnsignedByte(short n) {
-        if (debugTypes) {
+        if (n < 0 || n > UNSIGNED_BYTE_MAX_VALUE) {
+            throw new ArithmeticException("Given integer " + n + " is not an unsigned byte");
+        } else if (debugTypes) {
             writeType(Type.U8);
         }
 
         buf.writeByte(n);
     }
 
-    private BigInteger readVarInt(Type type) {
+    private long readVarInt(Type type) {
         if (!type.isVarInt()) {
             throw new IllegalArgumentException("given type " + type + " is not a var int type");
         }
@@ -159,97 +169,106 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
         int bits = type.bitCount();
         int maxBytes = MathUtil.ceilDiv(bits, 7);
         int superfluousBits = (maxBytes * 7) - bits;
-        int mask = ((byte) -1) << (7 - superfluousBits);
-        BigInteger zigzag = ZERO;
+        int mask = -1 << (7 - superfluousBits);
 
+        long zigzag = 0;
         int usedBytes = 0;
         byte b;
         do {
             b = buf.readByte();
             int data = b & 0b01111111;
             if (usedBytes == maxBytes - 1 && (data & mask) != 0) {
-                throw new RuntimeException("var int too big");
+                throw new RuntimeException("var int too long for type " + type);
             }
 
-            zigzag = zigzag.or(BigIntegerMath.of(data).shiftLeft(7 * usedBytes++));
+            zigzag |= (long) data << (7 * usedBytes++);
         } while ((b & 0b10000000) != 0);
 
-        return zigzag.shiftRight(1).xor(zigzag.and(ONE).negate());
+        long result = (zigzag >>> 1) ^ -(zigzag & 1);
+        if (result > (1L << (bits - 1)) - 1 || result < -1L << (bits - 1)) {
+            throw new ArithmeticException("result integer " + result + " out of bounds for type " + type);
+        }
+
+        return result;
     }
 
-    private void writeVarInt(Type type, BigInteger n) {
+    private void writeVarInt(Type type, long n) {
         if (!type.isVarInt()) {
             throw new IllegalArgumentException("given type " + type + " is not a var int type");
-        } else if (type.isUnsigned() && n.signum() < 0) {
-            throw new IllegalArgumentException("given var int type is unsigned, but the given integer is negative");
+        }
+
+        int bits = type.bitCount();
+        if (n > (1L << (bits - 1)) - 1 || n < -1L << (bits - 1)) {
+            throw new ArithmeticException("given integer " + n + " out of bounds for type " + type);
         }
 
         if (debugTypes) {
             writeType(type);
         }
 
-        int bits = type.bitCount();
-
-        int usableBits = type.isUnsigned() ? bits : bits - 1;
-        if (n.bitLength() > usableBits) {
-            throw new RuntimeException("number too big");
-        }
-
-        BigInteger zigzag = n.shiftRight(bits - 1).xor(n.shiftLeft(1));
+        long zigzag = (n >> (Long.SIZE - 1)) ^ (n << 1);
         do {
-            int data = zigzag.and(DATA_MASK).intValue();
-            zigzag = zigzag.shiftRight(7);
-            if (zigzag.signum() > 0) {
+            int data = (int) zigzag & 0b01111111;
+            zigzag = zigzag >>> 7;
+            if (zigzag != 0) {
                 data |= 0b10000000;
             }
 
             buf.writeByte(data);
-        } while (zigzag.signum() > 0);
+        } while (zigzag != 0);
     }
 
     @Override
     public short readShort() {
-        return readVarInt(Type.VAR_I16).shortValue();
+        return (short) readVarInt(Type.VAR_I16);
     }
 
     @Override
     public int readUnsignedShort() {
-        return readVarInt(Type.VAR_U16).intValue();
+        return Short.toUnsignedInt((short) readVarInt(Type.VAR_U16));
     }
 
     @Override
     public void writeShort(short n) {
-        writeVarInt(Type.VAR_I16, BigIntegerMath.of(n));
+        writeVarInt(Type.VAR_I16, n);
     }
 
     @Override
     public void writeUnsignedShort(int n) {
-        writeVarInt(Type.VAR_U16, BigIntegerMath.of(n));
+        if (n < 0 || n > UNSIGNED_SHORT_MAX_VALUE) {
+            throw new ArithmeticException("Given integer " + n + " is not an unsigned short");
+        }
+
+        writeVarInt(Type.VAR_U16, (short) n);
     }
 
     @Override
     public int readInt() {
-        return readVarInt(Type.VAR_I32).intValue();
+        return (int) readVarInt(Type.VAR_I32);
     }
 
     @Override
     public long readUnsignedInt() {
-        return readVarInt(Type.VAR_U32).longValue();
+        return Integer.toUnsignedLong((int) readVarInt(Type.VAR_U32));
     }
 
     @Override
     public void writeInt(int n) {
-        writeVarInt(Type.VAR_I32, BigIntegerMath.of(n));
+        writeVarInt(Type.VAR_I32, n);
     }
 
     @Override
     public void writeUnsignedInt(long n) {
-        writeVarInt(Type.VAR_U32, BigIntegerMath.of(n));
+        if (n < 0 || n > UNSIGNED_INT_MAX_VALUE) {
+            throw new ArithmeticException("Given integer " + n + " is not an unsigned int");
+        }
+
+        writeVarInt(Type.VAR_U32, (int) n);
     }
 
     @Override
     public long readLong() {
-        return readVarInt(Type.VAR_I64).longValue();
+        return readVarInt(Type.VAR_I64);
     }
 
     @Override
@@ -264,17 +283,41 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
 
     @Override
     public BigInteger readUnsignedLong() {
-        return readVarInt(Type.VAR_U64);
+        return MathUtil.toUnsignedBigInteger(readVarInt(Type.VAR_U64));
     }
 
     @Override
     public void writeLong(long n) {
-        writeVarInt(Type.VAR_I64, BigIntegerMath.of(n));
+        writeVarInt(Type.VAR_I64, n);
     }
 
     @Override
     public void writeUnsignedLong(BigInteger n) {
-        writeVarInt(Type.VAR_U64, n);
+        if (n.signum() < 0 || n.compareTo(UNSIGNED_LONG_MAX_VALUE) > 0) {
+            throw new ArithmeticException("Given integer " + n + " is not an unsigned long");
+        }
+
+        writeVarInt(Type.VAR_U64, n.longValue());
+    }
+
+    @Override
+    public <T extends NetworkEnum<T>> T readEnum(Byte2ObjectFunction<T> enumFactory) {
+        return Objects.requireNonNull(enumFactory.get(readByte()), "enum value must not be null");
+    }
+
+    @Override
+    public <T extends NetworkEnum<T>> T readNullableEnum(Byte2ObjectFunction<T> enumFactory) {
+        return enumFactory.get(readByte());
+    }
+
+    @Override
+    public <T extends NetworkEnum<T>> void writeEnum(T value) {
+        writeByte(value.getId());
+    }
+
+    @Override
+    public <T extends NetworkEnum<T>> void writeNullableEnum(T value) {
+        writeByte(value != null ? value.getId() : 0);
     }
 
     @Override
@@ -303,16 +346,6 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
         buf.readerIndex(currentIndex);
 
         return b.toString();
-    }
-
-    @Override
-    public <T extends NetworkEnum<T>> T readEnum(Byte2ObjectFunction<T> enumFactory) {
-        return enumFactory.get(readByte());
-    }
-
-    @Override
-    public <T extends NetworkEnum<T>> void writeEnum(T value) {
-        writeByte(value.getId());
     }
 
     enum Type {

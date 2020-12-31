@@ -7,12 +7,10 @@ import io.netty.channel.ChannelHandlerContext;
 
 public class EventPacket implements ClientboundPacket {
 
-    private final long answerTo;
     private final Event event;
 
     public EventPacket(ReadablePacketBuffer buf) {
         Event.Type type = buf.readEnum(Event.Type::fromId);
-        answerTo = buf.readLong();
         event = type.read(buf);
     }
 

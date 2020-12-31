@@ -7,6 +7,7 @@ import it.unimi.dsi.fastutil.bytes.Byte2ObjectMap;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectOpenHashMap;
 
 import java.util.Comparator;
+import java.util.NoSuchElementException;
 
 import static io.github.ititus.skat.game.card.CardColor.*;
 import static io.github.ititus.skat.game.card.CardType.*;
@@ -83,10 +84,14 @@ public enum Card implements NetworkEnum<Card> {
     }
 
     public static Card fromId(byte id) {
+        if (id == 0) {
+            return null;
+        }
+
         Card c = ID_MAP.get(id);
-        /*if (c == null) {
+        if (c == null) {
             throw new NoSuchElementException("unknown card id " + id);
-        }*/
+        }
 
         return c;
     }

@@ -4,11 +4,16 @@ import io.github.ititus.skat.network.buffer.WritablePacketBuffer;
 
 public class ReizenNumberAction extends Action {
 
-    public ReizenNumberAction() {
-        super(Type.REIZEN_NUMBER);
+    private final int reizwert;
+
+    public ReizenNumberAction(long id, int reizwert) {
+        super(Type.REIZEN_NUMBER, id);
+        this.reizwert = reizwert;
     }
 
     @Override
     public void write(WritablePacketBuffer buf) {
+        super.write(buf);
+        buf.writeUnsignedShort(reizwert);
     }
 }

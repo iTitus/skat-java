@@ -10,9 +10,11 @@ import java.util.Optional;
 public abstract class Event {
 
     private final Type type;
+    private final long answerTo;
 
-    protected Event(Type type) {
+    protected Event(Type type, ReadablePacketBuffer buf) {
         this.type = type;
+        answerTo = buf.readLong();
     }
 
     public Type getType() {

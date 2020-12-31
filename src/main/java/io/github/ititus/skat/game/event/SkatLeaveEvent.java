@@ -8,7 +8,7 @@ import java.util.Optional;
 public class SkatLeaveEvent extends Event {
 
     public SkatLeaveEvent(ReadablePacketBuffer buf) {
-        super(Type.SKAT_LEAVE);
+        super(Type.SKAT_LEAVE, buf);
     }
 
     @Override

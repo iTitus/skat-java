@@ -7,8 +7,11 @@ import java.util.Optional;
 
 public class ReizenNumberEvent extends Event {
 
+    private final int reizwertFinal;
+
     public ReizenNumberEvent(ReadablePacketBuffer buf) {
-        super(Type.REIZEN_NUMBER);
+        super(Type.REIZEN_NUMBER, buf);
+        reizwertFinal = buf.readUnsignedShort();
     }
 
     @Override

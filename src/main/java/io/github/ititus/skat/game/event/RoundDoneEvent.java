@@ -7,8 +7,11 @@ import java.util.Optional;
 
 public class RoundDoneEvent extends Event {
 
+    private final long[] scoreTotal;
+
     public RoundDoneEvent(ReadablePacketBuffer buf) {
-        super(Type.ROUND_DONE);
+        super(Type.ROUND_DONE, buf);
+        scoreTotal = buf.readLongs(4);
     }
 
     @Override

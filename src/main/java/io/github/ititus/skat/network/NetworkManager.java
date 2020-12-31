@@ -21,7 +21,7 @@ import java.util.function.Consumer;
 
 public class NetworkManager extends SimpleChannelInboundHandler<ClientboundPacket> {
 
-    public static final int VERSION = 4;
+    public static final int VERSION = 5;
 
     public static final AttributeKey<ConnectionState> CONNECTION_STATE_KEY = AttributeKey.valueOf("state");
 

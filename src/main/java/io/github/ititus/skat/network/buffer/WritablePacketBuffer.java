@@ -28,4 +28,6 @@ public interface WritablePacketBuffer extends PacketBuffer {
 
     <T extends NetworkEnum<T>> void writeEnum(T value);
 
+    <T extends NetworkEnum<T>> void writeNullableEnum(T value);
+
 }

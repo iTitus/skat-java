@@ -19,6 +19,8 @@ public interface ReadablePacketBuffer extends PacketBuffer {
 
     short readUnsignedByte();
 
+    short[] readUnsignedBytes(int length);
+
     short readShort();
 
     int readUnsignedShort();
@@ -34,5 +36,7 @@ public interface ReadablePacketBuffer extends PacketBuffer {
     BigInteger readUnsignedLong();
 
     <T extends NetworkEnum<T>> T readEnum(Byte2ObjectFunction<T> enumFactory);
+
+    <T extends NetworkEnum<T>> T readNullableEnum(Byte2ObjectFunction<T> enumFactory);
 
 }

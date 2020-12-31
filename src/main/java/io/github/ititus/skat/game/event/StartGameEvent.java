@@ -8,7 +8,7 @@ import java.util.Optional;
 public class StartGameEvent extends Event {
 
     public StartGameEvent(ReadablePacketBuffer buf) {
-        super(Type.START_GAME);
+        super(Type.START_GAME, buf);
     }
 
     @Override

@@ -2,9 +2,11 @@ package io.github.ititus.skat.game.gamestate;
 
 import io.github.ititus.skat.game.card.CardColor;
 import io.github.ititus.skat.network.NetworkEnum;
+import io.github.ititus.skat.network.buffer.PacketBufferSerializer;
 import io.github.ititus.skat.network.buffer.ReadablePacketBuffer;
+import io.github.ititus.skat.network.buffer.WritablePacketBuffer;
 
-public final class GameRules {
+public final class GameRules implements PacketBufferSerializer {
 
     private final GameType type;
     private final CardColor trumpf;
@@ -14,8 +16,8 @@ public final class GameRules {
     private final boolean ouvert;
 
     public GameRules(ReadablePacketBuffer buf) {
-        type = buf.readEnum(GameType::fromId);
-        trumpf = buf.readEnum(CardColor::fromId);
+        type = buf.readNullableEnum(GameType::fromId);
+        trumpf = buf.readNullableEnum(CardColor::fromId);
         hand = buf.readBoolean();
         schneiderAngesagt = buf.readBoolean();
         schwarzAngesagt = buf.readBoolean();
@@ -24,6 +26,16 @@ public final class GameRules {
 
     public boolean isValid() {
         return type != null;
+    }
+
+    @Override
+    public void write(WritablePacketBuffer buf) {
+        buf.writeNullableEnum(type);
+        buf.writeNullableEnum(trumpf);
+        buf.writeBoolean(hand);
+        buf.writeBoolean(schneiderAngesagt);
+        buf.writeBoolean(schwarzAngesagt);
+        buf.writeBoolean(ouvert);
     }
 
     public enum GameType implements NetworkEnum<GameType> {

@@ -8,7 +8,7 @@ import java.util.Optional;
 public class IllegalActionEvent extends Event {
 
     public IllegalActionEvent(ReadablePacketBuffer buf) {
-        super(Type.ILLEGAL_ACTION);
+        super(Type.ILLEGAL_ACTION, buf);
     }
 
     @Override

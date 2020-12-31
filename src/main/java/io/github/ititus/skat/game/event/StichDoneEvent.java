@@ -7,8 +7,11 @@ import java.util.Optional;
 
 public class StichDoneEvent extends Event {
 
+    private final byte stichWinner;
+
     public StichDoneEvent(ReadablePacketBuffer buf) {
-        super(Type.SKAT_PRESS);
+        super(Type.SKAT_PRESS, buf);
+        stichWinner = buf.readByte();
     }
 
     @Override
