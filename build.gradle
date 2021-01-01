@@ -20,7 +20,7 @@ java {
 
 application {
     mainModule = 'io.github.ititus.skat'
-    mainClass = 'io.github.ititus.skat.Main'
+    mainClass = 'io.github.ititus.skat.SkatClient'
 
     applicationDefaultJvmArgs = ['-Djava.util.logging.config.file=logging.properties']
 }
