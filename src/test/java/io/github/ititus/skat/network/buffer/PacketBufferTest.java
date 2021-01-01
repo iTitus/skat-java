@@ -1,6 +1,7 @@
 package io.github.ititus.skat.network.buffer;
 
 import io.github.ititus.math.number.BigIntegerMath;
+import io.github.ititus.math.number.JavaMath;
 import io.netty.buffer.Unpooled;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -12,9 +13,6 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Stream;
 
-import static io.github.ititus.skat.util.MathUtil.toUnsignedBigInteger;
-import static java.lang.Integer.toUnsignedLong;
-import static java.lang.Short.toUnsignedInt;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.of;
 
@@ -47,7 +45,7 @@ class PacketBufferTest {
             Object[] objs = args.get();
             short n = ((Number) objs[0]).shortValue();
             if (n < 0) {
-                return of(toUnsignedInt(n), objs[1]);
+                return of(Short.toUnsignedInt(n), objs[1]);
             }
 
             return args;
@@ -76,7 +74,7 @@ class PacketBufferTest {
             Object[] objs = args.get();
             int n = ((Number) objs[0]).intValue();
             if (n < 0) {
-                return of(toUnsignedLong(n), objs[1]);
+                return of(Integer.toUnsignedLong(n), objs[1]);
             }
 
             return args;
@@ -120,7 +118,7 @@ class PacketBufferTest {
             Object[] objs = args.get();
             long n = ((Number) objs[0]).longValue();
             if (n < 0) {
-                return of(toUnsignedBigInteger(n), objs[1]);
+                return of(JavaMath.toUnsignedBigInteger(n), objs[1]);
             }
 
             return of(BigIntegerMath.of(n), objs[1]);

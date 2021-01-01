@@ -16,7 +16,7 @@ public abstract class GameState {
     protected final ScoreBoard scoreBoard;
     protected final Stich currentStich;
     protected final Stich lastStich;
-    protected final byte stichNum;
+    protected final short stichNum;
     protected final Player alleinspieler;
     protected final boolean tookSkat;
     protected final CardCollection hand;
@@ -24,7 +24,7 @@ public abstract class GameState {
     protected final Player partner;
 
     GameState(GamePhase phase, ReizState reizState, GameRules rules, Player[] activePlayers, ScoreBoard scoreBoard,
-              Stich currentStich, Stich lastStich, byte stichNum, Player alleinspieler, boolean tookSkat,
+              Stich currentStich, Stich lastStich, short stichNum, Player alleinspieler, boolean tookSkat,
               CardCollection hand, Player player, Player partner) {
         this.phase = phase;
         this.reizState = reizState;

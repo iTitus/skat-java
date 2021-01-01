@@ -21,6 +21,11 @@ public final class NetworkReizState {
     }
 
     public ReizState get(SkatClient skatClient) {
-        return null;
+        return new ReizState(
+                phase,
+                waitingForTeller,
+                reizwert,
+                skatClient.getPlayer(winner)
+        );
     }
 }

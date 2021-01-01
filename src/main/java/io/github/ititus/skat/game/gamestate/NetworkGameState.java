@@ -47,4 +47,64 @@ public class NetworkGameState {
     public GameState get(SkatClient client) {
         return phase.create(client, this);
     }
+
+    public GamePhase getPhase() {
+        return phase;
+    }
+
+    public NetworkReizState getReizState() {
+        return reizState;
+    }
+
+    public GameRules getRules() {
+        return rules;
+    }
+
+    public byte[] getActivePlayers() {
+        return activePlayers;
+    }
+
+    public ScoreBoard getScoreBoard() {
+        return scoreBoard;
+    }
+
+    public NetworkStich getCurrentStich() {
+        return currentStich;
+    }
+
+    public NetworkStich getLastStich() {
+        return lastStich;
+    }
+
+    public short getStichNum() {
+        return stichNum;
+    }
+
+    public byte getAlleinspieler() {
+        return alleinspieler;
+    }
+
+    public boolean isTookSkat() {
+        return tookSkat;
+    }
+
+    public CardCollection getHand() {
+        return hand;
+    }
+
+    public byte getMyGupid() {
+        return myGupid;
+    }
+
+    public byte getMyActivePlayerIndex() {
+        return myActivePlayerIndex;
+    }
+
+    public byte getMyPartner() {
+        return myPartner;
+    }
+
+    public boolean isIstAlleinspieler() {
+        return istAlleinspieler;
+    }
 }

@@ -1,5 +1,6 @@
 package io.github.ititus.skat.network.buffer;
 
+import io.github.ititus.math.number.JavaMath;
 import io.github.ititus.skat.network.NetworkEnum;
 import io.github.ititus.skat.util.MathUtil;
 import io.netty.buffer.ByteBuf;
@@ -11,8 +12,6 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.function.Function;
-
-import static io.github.ititus.skat.util.MathUtil.*;
 
 public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuffer {
 
@@ -148,7 +147,7 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
 
     @Override
     public void writeUnsignedByte(short n) {
-        if (n < 0 || n > UNSIGNED_BYTE_MAX_VALUE) {
+        if (n < 0 || n > JavaMath.UNSIGNED_BYTE_MAX_VALUE) {
             throw new ArithmeticException("Given integer " + n + " is not an unsigned byte");
         } else if (debugTypes) {
             writeType(Type.U8);
@@ -235,7 +234,7 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
 
     @Override
     public void writeUnsignedShort(int n) {
-        if (n < 0 || n > UNSIGNED_SHORT_MAX_VALUE) {
+        if (n < 0 || n > JavaMath.UNSIGNED_SHORT_MAX_VALUE) {
             throw new ArithmeticException("Given integer " + n + " is not an unsigned short");
         }
 
@@ -259,7 +258,7 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
 
     @Override
     public void writeUnsignedInt(long n) {
-        if (n < 0 || n > UNSIGNED_INT_MAX_VALUE) {
+        if (n < 0 || n > JavaMath.UNSIGNED_INT_MAX_VALUE) {
             throw new ArithmeticException("Given integer " + n + " is not an unsigned int");
         }
 
@@ -283,7 +282,7 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
 
     @Override
     public BigInteger readUnsignedLong() {
-        return MathUtil.toUnsignedBigInteger(readVarInt(Type.VAR_U64));
+        return JavaMath.toUnsignedBigInteger(readVarInt(Type.VAR_U64));
     }
 
     @Override
@@ -293,7 +292,7 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
 
     @Override
     public void writeUnsignedLong(BigInteger n) {
-        if (n.signum() < 0 || n.compareTo(UNSIGNED_LONG_MAX_VALUE) > 0) {
+        if (n.signum() < 0 || n.compareTo(JavaMath.UNSIGNED_LONG_MAX_VALUE) > 0) {
             throw new ArithmeticException("Given integer " + n + " is not an unsigned long");
         }
 
