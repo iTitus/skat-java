@@ -40,11 +40,10 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build with Gradle
-        run: ./gradlew jlinkZip
+        run: ./gradlew jlink
 
-      - name: Save Test Reports
+      - name: Save Image
         uses: actions/upload-artifact@v2
-        if: always()
         with:
           name: build-${{ matrix.os }}-${{ matrix.java }}
-          path: build/image.zip
+          path: build/image

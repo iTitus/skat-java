@@ -45,10 +45,10 @@ compileTestJava {
     moduleOptions {
         addModules = ['org.junit.jupiter.params']
         addReads = ['io.github.ititus.skat': 'org.junit.jupiter.params']
-        addExports = [
+        /*addExports = [
                 'org.junit.platform.commons/org.junit.platform.commons.util'   : 'ALL-UNNAMED',
                 'org.junit.platform.commons/org.junit.platform.commons.logging': 'ALL-UNNAMED'
-        ]
+        ]*/
     }
 }
 
@@ -56,7 +56,7 @@ test {
     useJUnitPlatform()
 
     moduleOptions {
-        addModules = ['org.junit.jupiter.params']
+        // addModules = ['org.junit.jupiter.params']
         addReads = ['io.github.ititus.skat': 'org.junit.jupiter.params']
         addExports = [
                 'org.junit.platform.commons/org.junit.platform.commons.util'   : 'ALL-UNNAMED',
