@@ -43,7 +43,7 @@ dependencies {
 
 compileTestJava {
     moduleOptions {
-        // addModules = ['org.junit.jupiter.params']
+        addModules = ['org.junit.jupiter.params']
         addReads = ['io.github.ititus.skat': 'org.junit.jupiter.params']
     }
 }
