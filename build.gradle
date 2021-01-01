@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'application'
+    id 'org.javamodularity.moduleplugin' version '1.7.0'
     id 'org.openjfx.javafxplugin' version '0.0.9'
     id 'org.beryx.jlink' version '2.23.1'
 }
@@ -15,9 +16,6 @@ wrapper {
 java {
     modularity.inferModulePath = true
     sourceCompatibility = targetCompatibility = JavaVersion.VERSION_11
-
-    // withSourcesJar()
-    // withJavadocJar()
 }
 
 application {
@@ -45,6 +43,17 @@ dependencies {
 
 test {
     useJUnitPlatform()
+
+    moduleOptions {
+        addReads = ['io.github.ititus.skat': 'org.junit.jupiter.params']
+        addExports = [
+                'org.junit.platform.commons/org.junit.platform.commons.util'   : 'ALL-UNNAMED',
+                'org.junit.platform.commons/org.junit.platform.commons.logging': 'ALL-UNNAMED'
+        ]
+        addOpens = [
+                'io.github.ititus.skat/io.github.ititus.skat.network.buffer': 'org.junit.platform.commons'
+        ]
+    }
 }
 
 javafx {
