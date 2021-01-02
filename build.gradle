@@ -56,7 +56,7 @@ test {
                 'org.junit.platform.commons/org.junit.platform.commons.util'   : 'ALL-UNNAMED',
                 'org.junit.platform.commons/org.junit.platform.commons.logging': 'ALL-UNNAMED'
         ]
-        // addOpens = ['io.github.ititus.skat/io.github.ititus.skat.network.buffer': 'org.junit.platform.commons']
+        addOpens = ['io.github.ititus.skat/io.github.ititus.skat.network.buffer': 'org.junit.platform.commons']
     }
 }
 
