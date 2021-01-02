@@ -2,17 +2,18 @@ name: Gradle Build
 
 on:
   push:
-    branches: [ main, develop ]
+    branches:
+      - main
   pull_request:
-    branches: [ main, develop ]
+    branches:
+      - main
 
 jobs:
   build:
-
     strategy:
       matrix:
-        os: [ ubuntu-latest ]
-        java: [ 11, 15 ]
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+        java: [ 15 ]
 
     runs-on: ${{ matrix.os }}
 
@@ -50,3 +51,12 @@ jobs:
         with:
           name: test-reports-${{ matrix.os }}-${{ matrix.java }}
           path: build/reports
+
+      - name: Build jlink Image with Gradle
+        run: ./gradlew jlinkZip
+
+      - name: Save Image
+        uses: actions/upload-artifact@v2
+        with:
+          name: build-image-${{ matrix.os }}-${{ matrix.java }}
+          path: build/image.zip

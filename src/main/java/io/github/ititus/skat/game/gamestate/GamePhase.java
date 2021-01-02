@@ -134,48 +134,31 @@ public enum GamePhase implements NetworkEnum<GamePhase> {
     }
 
     private boolean isClientOnly() {
-        switch (this) {
-            case CLIENT_WAIT_REIZEN_DONE:
-            case CLIENT_WAIT_STICH_DONE:
-            case CLIENT_WAIT_ANNOUNCE_SCORES:
-            case CLIENT_WAIT_ROUND_DONE:
-                return true;
-            default:
-                return false;
-        }
+        return switch (this) {
+            case CLIENT_WAIT_REIZEN_DONE, CLIENT_WAIT_STICH_DONE, CLIENT_WAIT_ANNOUNCE_SCORES, CLIENT_WAIT_ROUND_DONE -> true;
+            default -> false;
+        };
     }
 
     private boolean isIngamePlayingCards() {
-        switch (this) {
-            case PLAY_STICH_C1:
-            case PLAY_STICH_C2:
-            case PLAY_STICH_C3:
-            case CLIENT_WAIT_STICH_DONE:
-                return true;
-            default:
-                return false;
-        }
+        return switch (this) {
+            case PLAY_STICH_C1, PLAY_STICH_C2, PLAY_STICH_C3, CLIENT_WAIT_STICH_DONE -> true;
+            default -> false;
+        };
     }
 
     private boolean isInRound() {
-        switch (this) {
-            case SETUP:
-            case BETWEEN_ROUNDS:
-                return false;
-            default:
-                return true;
-        }
+        return switch (this) {
+            case SETUP, BETWEEN_ROUNDS -> false;
+            default -> true;
+        };
     }
 
     private boolean teamsSet() {
-        switch (this) {
-            case SETUP:
-            case BETWEEN_ROUNDS:
-            case REIZEN:
-                return false;
-            default:
-                return true;
-        }
+        return switch (this) {
+            case SETUP, BETWEEN_ROUNDS, REIZEN -> false;
+            default -> true;
+        };
     }
 
     @FunctionalInterface
