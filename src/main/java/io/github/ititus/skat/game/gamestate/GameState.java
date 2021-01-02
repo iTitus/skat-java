@@ -1,5 +1,6 @@
 package io.github.ititus.skat.game.gamestate;
 
+import io.github.ititus.skat.SkatClient;
 import io.github.ititus.skat.game.Player;
 import io.github.ititus.skat.game.card.CardCollection;
 import io.github.ititus.skat.game.card.Stich;
@@ -41,67 +42,119 @@ public abstract class GameState {
         this.partner = partner;
     }
 
-    public Optional<GameState> apply(PlayCardEvent e) {
+    public GamePhase getPhase() {
+        return phase;
+    }
+
+    public ReizState getReizState() {
+        return reizState;
+    }
+
+    public GameRules getRules() {
+        return rules;
+    }
+
+    public Player[] getActivePlayers() {
+        return activePlayers;
+    }
+
+    public ScoreBoard getScoreBoard() {
+        return scoreBoard;
+    }
+
+    public Stich getCurrentStich() {
+        return currentStich;
+    }
+
+    public Stich getLastStich() {
+        return lastStich;
+    }
+
+    public short getStichNum() {
+        return stichNum;
+    }
+
+    public Player getAlleinspieler() {
+        return alleinspieler;
+    }
+
+    public boolean didTakeSkat() {
+        return tookSkat;
+    }
+
+    public CardCollection getHand() {
+        return hand;
+    }
+
+    public Player getPlayer() {
+        return player;
+    }
+
+    public Player getPartner() {
+        return partner;
+    }
+
+    public Optional<GameState> apply(SkatClient c, PlayCardEvent e) {
         return Optional.empty();
     }
 
-    public Optional<GameState> apply(StartGameEvent e) {
+    public Optional<GameState> apply(SkatClient c, StartGameEvent e) {
         return Optional.empty();
     }
 
-    public Optional<GameState> apply(IllegalActionEvent e) {
+    public Optional<GameState> apply(SkatClient c, IllegalActionEvent e) {
         return Optional.empty();
     }
 
-    public Optional<GameState> apply(AnnounceScoresEvent e) {
+    public Optional<GameState> apply(SkatClient c, AnnounceScoresEvent e) {
         return Optional.empty();
     }
 
-    public Optional<GameState> apply(DistributeCardsEvent e) {
+    public Optional<GameState> apply(SkatClient c, DistributeCardsEvent e) {
         return Optional.empty();
     }
 
-    public Optional<GameState> apply(GameCalledEvent e) {
+    public Optional<GameState> apply(SkatClient c, GameCalledEvent e) {
         return Optional.empty();
     }
 
-    public Optional<GameState> apply(ReizenConfirmEvent e) {
+    public Optional<GameState> apply(SkatClient c, ReizenConfirmEvent e) {
         return Optional.empty();
     }
 
-    public Optional<GameState> apply(ReizenDoneEvent e) {
+    public Optional<GameState> apply(SkatClient c, ReizenDoneEvent e) {
         return Optional.empty();
     }
 
-    public Optional<GameState> apply(ReizenNumberEvent e) {
+    public Optional<GameState> apply(SkatClient c, ReizenNumberEvent e) {
         return Optional.empty();
     }
 
-    public Optional<GameState> apply(ReizenPasseEvent e) {
+    public Optional<GameState> apply(SkatClient c, ReizenPasseEvent e) {
         return Optional.empty();
     }
 
-    public Optional<GameState> apply(RoundDoneEvent e) {
+    public Optional<GameState> apply(SkatClient c, RoundDoneEvent e) {
         return Optional.empty();
     }
 
-    public Optional<GameState> apply(SkatLeaveEvent e) {
+    public Optional<GameState> apply(SkatClient c, SkatLeaveEvent e) {
         return Optional.empty();
     }
 
-    public Optional<GameState> apply(SkatPressEvent e) {
+    public Optional<GameState> apply(SkatClient c, SkatPressEvent e) {
         return Optional.empty();
     }
 
-    public Optional<GameState> apply(SkatTakeEvent e) {
+    public Optional<GameState> apply(SkatClient c, SkatTakeEvent e) {
         return Optional.empty();
     }
 
-    public Optional<GameState> apply(StartRoundEvent e) {
+    public Optional<GameState> apply(SkatClient c, StartRoundEvent e) {
         return Optional.empty();
     }
 
-    public Optional<GameState> apply(StichDoneEvent e) {
+    public Optional<GameState> apply(SkatClient c, StichDoneEvent e) {
         return Optional.empty();
     }
 }

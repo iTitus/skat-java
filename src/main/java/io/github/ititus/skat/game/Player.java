@@ -48,4 +48,8 @@ public final class Player implements PacketBufferSerializer {
     public String getName() {
         return name;
     }
+
+    public Player withActivePlayerIndex(byte ap) {
+        return new Player(gupid, ap, name);
+    }
 }

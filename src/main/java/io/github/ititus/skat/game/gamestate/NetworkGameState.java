@@ -5,6 +5,8 @@ import io.github.ititus.skat.game.card.CardCollection;
 import io.github.ititus.skat.game.card.NetworkStich;
 import io.github.ititus.skat.network.buffer.ReadablePacketBuffer;
 
+import static io.github.ititus.skat.SkatClient.ACTIVE_PLAYERS;
+
 public class NetworkGameState {
 
     private final GamePhase phase;
@@ -18,6 +20,9 @@ public class NetworkGameState {
     private final NetworkStich currentStich;
     private final NetworkStich lastStich;
     private final short stichNum;
+    /**
+     * indexed by active player
+     */
     private final byte alleinspieler;
     private final boolean tookSkat;
     private final CardCollection hand;
@@ -30,7 +35,7 @@ public class NetworkGameState {
         phase = buf.readEnum(GamePhase::fromId);
         reizState = new NetworkReizState(buf);
         rules = new GameRules(buf);
-        activePlayers = buf.readBytes(3);
+        activePlayers = buf.readBytes(ACTIVE_PLAYERS);
         scoreBoard = ScoreBoard.read(buf);
         currentStich = new NetworkStich(buf);
         lastStich = new NetworkStich(buf);
@@ -84,7 +89,7 @@ public class NetworkGameState {
         return alleinspieler;
     }
 
-    public boolean isTookSkat() {
+    public boolean didTakeSkat() {
         return tookSkat;
     }
 
@@ -104,7 +109,7 @@ public class NetworkGameState {
         return myPartner;
     }
 
-    public boolean isIstAlleinspieler() {
+    public boolean isAlleinspieler() {
         return istAlleinspieler;
     }
 }

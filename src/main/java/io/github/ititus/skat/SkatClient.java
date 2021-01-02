@@ -21,6 +21,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class SkatClient extends Application {
 
+    public static final byte MAX_PLAYERS = 4;
+    public static final byte ACTIVE_PLAYERS = 3;
+
     private final AtomicBoolean exit = new AtomicBoolean(false);
     private final AtomicBoolean disconnect = new AtomicBoolean(false);
     private final Byte2ObjectMap<Player> players = new Byte2ObjectOpenHashMap<>();
@@ -112,8 +115,7 @@ public class SkatClient extends Application {
     }
 
     public void disconnect(String reason) {
-        if (disconnect.get() || exit.get()
-                || Optional.ofNullable(stage).map(Stage::getScene).map(Scene::getRoot).filter(root -> root instanceof ConnectGui).isPresent()) {
+        if (disconnect.get() || exit.get() || getCurrentGui(ConnectGui.class).isPresent()) {
             return;
         }
 
@@ -167,12 +169,16 @@ public class SkatClient extends Application {
         return Optional.empty();
     }
 
-    public Optional<Gui> getCurrentGui() {
+    public <T extends Gui> Optional<T> getCurrentGui(Class<T> clazz) {
         return Optional.ofNullable(stage)
                 .map(Stage::getScene)
                 .map(Scene::getRoot)
-                .filter(root -> root instanceof Gui)
-                .map(root -> (Gui) root);
+                .filter(clazz::isInstance)
+                .map(clazz::cast);
+    }
+
+    public Optional<Gui> getCurrentGui() {
+        return getCurrentGui(Gui.class);
     }
 
     public void setup(byte gupid, String name) {
@@ -202,6 +208,27 @@ public class SkatClient extends Application {
                 });
     }
 
+    public void setActivePlayerIndices(byte[] activePlayerIndices) {
+        if (activePlayerIndices.length != ACTIVE_PLAYERS) {
+            throw new IllegalArgumentException("activePlayerIndices must be of length " + ACTIVE_PLAYERS + " but was "
+                    + activePlayerIndices.length);
+        } else if (players.size() < ACTIVE_PLAYERS) {
+            throw new IllegalStateException("players must be at least be of size " + ACTIVE_PLAYERS + " but was " + players.size());
+        }
+
+        for (byte ap = 0; ap < ACTIVE_PLAYERS; ap++) {
+            byte gupid = activePlayerIndices[ap];
+            Player current = getPlayer(gupid);
+            if (current == null) {
+                throw new IllegalArgumentException("all gupids must be valid but got invalid one for ap " + ap);
+            }
+
+            if (current.getActivePlayerIndex() != ap) {
+                players.put(gupid, current.withActivePlayerIndex(ap));
+            }
+        }
+    }
+
     public Player getPlayer(byte gupid) {
         if (gupid == -1) {
             return null;
@@ -213,5 +240,22 @@ public class SkatClient extends Application {
         }
 
         return player;
+    }
+
+    public Player getActivePlayer(byte ap) {
+        if (ap == -1) {
+            return null;
+        }
+
+        if (gameState == null) {
+            throw new IllegalStateException("cannot get active player while there is no game state");
+        }
+
+        Player activePlayer = gameState.getActivePlayers()[ap];
+        if (activePlayer == null) {
+            throw new IllegalStateException("cannot get active player while not in a round");
+        }
+
+        return activePlayer;
     }
 }

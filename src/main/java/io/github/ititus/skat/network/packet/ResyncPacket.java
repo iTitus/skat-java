@@ -12,6 +12,8 @@ import it.unimi.dsi.fastutil.bytes.Byte2ObjectMap;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectOpenHashMap;
 import javafx.application.Platform;
 
+import static io.github.ititus.skat.SkatClient.MAX_PLAYERS;
+
 public class ResyncPacket implements ClientboundPacket {
 
     private final NetworkGameState gameState;
@@ -21,9 +23,9 @@ public class ResyncPacket implements ClientboundPacket {
     public ResyncPacket(ReadablePacketBuffer buf) {
         gameState = new NetworkGameState(buf);
 
-        activePlayerIndices = new byte[4];
-        playerNames = new String[4];
-        for (byte gupid = 0; gupid < 4; gupid++) {
+        activePlayerIndices = new byte[MAX_PLAYERS];
+        playerNames = new String[MAX_PLAYERS];
+        for (byte gupid = 0; gupid < MAX_PLAYERS; gupid++) {
             if (buf.readBoolean()) {
                 activePlayerIndices[gupid] = buf.readByte();
                 playerNames[gupid] = buf.readString();
@@ -43,7 +45,7 @@ public class ResyncPacket implements ClientboundPacket {
         GameState state = gameState.get(skatClient);
 
         Byte2ObjectMap<Player> players = new Byte2ObjectOpenHashMap<>();
-        for (byte gupid = 0; gupid < 4; gupid++) {
+        for (byte gupid = 0; gupid < MAX_PLAYERS; gupid++) {
             if (playerNames[gupid] != null) {
                 players.put(gupid, new Player(gupid, activePlayerIndices[gupid], playerNames[gupid]));
             }

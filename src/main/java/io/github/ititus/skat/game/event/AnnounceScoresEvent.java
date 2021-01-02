@@ -1,10 +1,13 @@
 package io.github.ititus.skat.game.event;
 
+import io.github.ititus.skat.SkatClient;
 import io.github.ititus.skat.game.gamestate.GameState;
 import io.github.ititus.skat.network.NetworkEnum;
 import io.github.ititus.skat.network.buffer.ReadablePacketBuffer;
 
 import java.util.Optional;
+
+import static io.github.ititus.skat.SkatClient.ACTIVE_PLAYERS;
 
 public class AnnounceScoresEvent extends Event {
 
@@ -30,9 +33,9 @@ public class AnnounceScoresEvent extends Event {
     public AnnounceScoresEvent(ReadablePacketBuffer buf) {
         super(Type.ANNOUNCE_SCORES, buf);
         roundWinner = buf.readByte();
-        playerPoints = buf.readUnsignedBytes(3);
-        playerStichCardCounts = buf.readUnsignedBytes(3);
-        roundScore = buf.readLongs(3);
+        playerPoints = buf.readUnsignedBytes(ACTIVE_PLAYERS);
+        playerStichCardCounts = buf.readUnsignedBytes(ACTIVE_PLAYERS);
+        roundScore = buf.readLongs(ACTIVE_PLAYERS);
         spielwert = buf.readUnsignedShort();
         lossType = buf.readEnum(LossType::fromId);
         normalEnd = buf.readBoolean();
@@ -41,8 +44,8 @@ public class AnnounceScoresEvent extends Event {
     }
 
     @Override
-    public Optional<GameState> visit(GameState g) {
-        return g.apply(this);
+    public Optional<GameState> visit(SkatClient c, GameState g) {
+        return g.apply(c, this);
     }
 
     public enum LossType implements NetworkEnum<LossType> {

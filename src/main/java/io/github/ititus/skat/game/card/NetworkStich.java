@@ -5,6 +5,8 @@ import io.github.ititus.skat.network.buffer.ReadablePacketBuffer;
 
 import java.util.Arrays;
 
+import static io.github.ititus.skat.SkatClient.ACTIVE_PLAYERS;
+
 public final class NetworkStich {
 
     /**
@@ -22,8 +24,8 @@ public final class NetworkStich {
     private final byte winner;
 
     public NetworkStich(ReadablePacketBuffer buf) {
-        cards = new Card[3];
-        for (int ap = 0; ap < 3; ap++) {
+        cards = new Card[ACTIVE_PLAYERS];
+        for (int ap = 0; ap < ACTIVE_PLAYERS; ap++) {
             cards[ap] = Card.read(buf);
         }
         playedCards = buf.readUnsignedByte();

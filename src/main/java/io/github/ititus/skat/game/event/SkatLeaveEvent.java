@@ -1,5 +1,6 @@
 package io.github.ititus.skat.game.event;
 
+import io.github.ititus.skat.SkatClient;
 import io.github.ititus.skat.game.gamestate.GameState;
 import io.github.ititus.skat.network.buffer.ReadablePacketBuffer;
 
@@ -12,7 +13,7 @@ public class SkatLeaveEvent extends Event {
     }
 
     @Override
-    public Optional<GameState> visit(GameState g) {
-        return g.apply(this);
+    public Optional<GameState> visit(SkatClient c, GameState g) {
+        return g.apply(c, this);
     }
 }

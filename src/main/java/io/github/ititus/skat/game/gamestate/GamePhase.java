@@ -8,6 +8,9 @@ import io.github.ititus.skat.network.NetworkEnum;
 
 import java.util.Objects;
 
+import static io.github.ititus.skat.SkatClient.ACTIVE_PLAYERS;
+import static java.util.Arrays.stream;
+
 public enum GamePhase implements NetworkEnum<GamePhase> {
 
     SETUP(GameStateSetup::new),
@@ -50,30 +53,129 @@ public enum GamePhase implements NetworkEnum<GamePhase> {
     }
 
     public GameState create(SkatClient c, NetworkGameState ngs) {
-        byte[] activePlayersGupid = ngs.getActivePlayers();
-        if (activePlayersGupid.length != 3) {
-            throw new IllegalArgumentException("expected 3 active players");
+        if (isClientOnly()) {
+            throw new IllegalStateException("received client only game state from server");
         }
 
-        Player[] activePlayers = new Player[3];
-        for (byte ap = 0; ap < 3; ap++) {
-            activePlayers[ap] = c.getPlayer(activePlayersGupid[ap]);
+        byte[] activePlayersGupid = ngs.getActivePlayers();
+        if (activePlayersGupid.length != ACTIVE_PLAYERS) {
+            throw new IllegalArgumentException("expected " + ACTIVE_PLAYERS + " active players");
+        }
+
+        byte alleinspielerAp = ngs.getAlleinspieler();
+        Player alleinspieler = null;
+
+        Player[] activePlayers = new Player[ACTIVE_PLAYERS];
+        for (byte ap = 0; ap < ACTIVE_PLAYERS; ap++) {
+            Player p = c.getPlayer(activePlayersGupid[ap]);
+            activePlayers[ap] = p;
+            if (alleinspielerAp >= 0 && p != null && p.getActivePlayerIndex() == alleinspielerAp) {
+                alleinspieler = p;
+            }
+        }
+
+        if (stream(activePlayers).allMatch(Objects::isNull)) {
+            activePlayers = null;
+        } else if (stream(activePlayers).anyMatch(Objects::isNull)) {
+            throw new IllegalArgumentException("either all no activePlayers must be null");
+        }
+
+        ReizState reizState = ngs.getReizState().get(c);
+        if (!reizState.isValid()) {
+            reizState = null;
+        }
+
+        GameRules rules = ngs.getRules();
+        if (!rules.isValid()) {
+            rules = null;
+        }
+
+        ScoreBoard scoreBoard = ngs.getScoreBoard();
+        if (this == SETUP) {
+            scoreBoard = null;
+        }
+
+        Stich currentStich = ngs.getCurrentStich().get(c);
+        Stich lastStich = ngs.getLastStich().get(c);
+        short stichNum = ngs.getStichNum();
+        if (!isIngamePlayingCards()) {
+            currentStich = lastStich = null;
+            stichNum = 0;
+        }
+
+        boolean tookSkat = ngs.didTakeSkat();
+        CardCollection hand = ngs.getHand();
+        if (!isInRound()) {
+            tookSkat = false;
+            hand = null;
+        }
+
+        Player player = Objects.requireNonNull(c.getPlayer(ngs.getMyGupid()), "my player must not be null");
+
+        Player partner = c.getPlayer(ngs.getMyPartner());
+        if (!teamsSet()) {
+            partner = null;
         }
 
         return constructor.create(
-                ngs.getReizState().get(c),
-                ngs.getRules(),
+                reizState,
+                rules,
                 activePlayers,
-                ngs.getScoreBoard(),
-                ngs.getCurrentStich().get(c),
-                ngs.getLastStich().get(c),
-                ngs.getStichNum(),
-                c.getPlayer(ngs.getAlleinspieler()),
-                ngs.isTookSkat(),
-                ngs.getHand(),
-                Objects.requireNonNull(c.getPlayer(ngs.getMyGupid()), "my player must not be null"),
-                c.getPlayer(ngs.getMyPartner())
+                scoreBoard,
+                currentStich,
+                lastStich,
+                stichNum,
+                alleinspieler,
+                tookSkat,
+                hand,
+                player,
+                partner
         );
+    }
+
+    private boolean isClientOnly() {
+        switch (this) {
+            case CLIENT_WAIT_REIZEN_DONE:
+            case CLIENT_WAIT_STICH_DONE:
+            case CLIENT_WAIT_ANNOUNCE_SCORES:
+            case CLIENT_WAIT_ROUND_DONE:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private boolean isIngamePlayingCards() {
+        switch (this) {
+            case PLAY_STICH_C1:
+            case PLAY_STICH_C2:
+            case PLAY_STICH_C3:
+            case CLIENT_WAIT_STICH_DONE:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private boolean isInRound() {
+        switch (this) {
+            case SETUP:
+            case BETWEEN_ROUNDS:
+                return false;
+            default:
+                return true;
+        }
+    }
+
+    private boolean teamsSet() {
+        switch (this) {
+            case SETUP:
+            case BETWEEN_ROUNDS:
+            case REIZEN:
+                return false;
+            default:
+                return true;
+        }
     }
 
     @FunctionalInterface

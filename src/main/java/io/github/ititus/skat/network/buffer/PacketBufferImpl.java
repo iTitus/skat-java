@@ -165,10 +165,10 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
             checkType(type);
         }
 
-        int bits = type.bitCount();
+        int bits = 8 * type.getByteCount();
         int maxBytes = MathUtil.ceilDiv(bits, 7);
-        int superfluousBits = (maxBytes * 7) - bits;
-        int mask = -1 << (7 - superfluousBits);
+        int superfluousBits = 7 * maxBytes - bits;
+        int mask = -1 << 7 - superfluousBits;
 
         long zigzag = 0;
         int usedBytes = 0;
@@ -196,7 +196,7 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
             throw new IllegalArgumentException("given type " + type + " is not a var int type");
         }
 
-        int bits = type.bitCount();
+        int bits = 8 * type.getByteCount();
         if (n > (1L << (bits - 1)) - 1 || n < -1L << (bits - 1)) {
             throw new ArithmeticException("given integer " + n + " out of bounds for type " + type);
         }
@@ -207,7 +207,7 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
 
         long zigzag = (n >> (Long.SIZE - 1)) ^ (n << 1);
         do {
-            int data = (int) zigzag & 0b01111111;
+            int data = (int) (zigzag & 0b01111111);
             zigzag = zigzag >>> 7;
             if (zigzag != 0) {
                 data |= 0b10000000;
@@ -347,112 +347,90 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
         return b.toString();
     }
 
-    enum Type {
+    enum Type implements NetworkEnum<Type> {
 
-        I8(1, "i8", ReadablePacketBuffer::readByte),
-        U8(2, "u8", ReadablePacketBuffer::readUnsignedByte),
-        VAR_I16(3, "i16", ReadablePacketBuffer::readShort),
-        VAR_I32(4, "i32", ReadablePacketBuffer::readInt),
-        VAR_I64(5, "i64", ReadablePacketBuffer::readLong),
-        VAR_U16(6, "u16", ReadablePacketBuffer::readUnsignedShort),
-        VAR_U32(7, "u32", ReadablePacketBuffer::readUnsignedInt),
-        VAR_U64(8, "u64", ReadablePacketBuffer::readUnsignedLong),
-        BOOL(9, "b", ReadablePacketBuffer::readBoolean),
-        STR(10, "s", buf -> "'" + buf.readString() + "'");
+        I8("i8", ReadablePacketBuffer::readByte, 1, false, true, true),
+        U8("u8", ReadablePacketBuffer::readUnsignedByte, 1, false, true, false),
+        VAR_I16("i16", ReadablePacketBuffer::readShort, 2, true, true, true),
+        VAR_I32("i32", ReadablePacketBuffer::readInt, 2, true, true, true),
+        VAR_I64("i64", ReadablePacketBuffer::readLong, 4, true, true, true),
+        VAR_U16("u16", ReadablePacketBuffer::readUnsignedShort, 4, true, true, false),
+        VAR_U32("u32", ReadablePacketBuffer::readUnsignedInt, 8, true, true, false),
+        VAR_U64("u64", ReadablePacketBuffer::readUnsignedLong, 8, true, true, false),
+        BOOL("b", ReadablePacketBuffer::readBoolean, 1, false, false, false),
+        STR("s", buf -> "'" + buf.readString() + "'", -1, true, false, false);
 
-        private final byte id;
         private final String symbol;
         private final Function<ReadablePacketBuffer, ?> extractor;
+        private final int byteCount;
+        private final boolean variableLength;
+        private final boolean integer;
+        private final boolean signed;
 
-        Type(int id, String symbol, Function<ReadablePacketBuffer, ?> extractor) {
-            this.id = (byte) id;
+        Type(String symbol, Function<ReadablePacketBuffer, ?> extractor, int byteCount, boolean variableLength,
+             boolean integer, boolean signed) {
             this.symbol = symbol;
             this.extractor = extractor;
+            this.byteCount = byteCount;
+            this.variableLength = variableLength;
+            this.integer = integer;
+            this.signed = signed;
         }
 
-        static Type fromId(byte id) {
-            switch (id) {
-                case 1:
-                    return I8;
-                case 2:
-                    return U8;
-                case 3:
-                    return VAR_I16;
-                case 4:
-                    return VAR_I32;
-                case 5:
-                    return VAR_I64;
-                case 6:
-                    return VAR_U16;
-                case 7:
-                    return VAR_U32;
-                case 8:
-                    return VAR_U64;
-                case 9:
-                    return BOOL;
-                case 10:
-                    return STR;
-                default:
-                    throw new IllegalArgumentException("unknown type id " + id);
+        public static Type fromId(byte id) {
+            Type[] values = values();
+            int ordinal = id - 1;
+            if (ordinal < 0 || ordinal >= values.length) {
+                throw new IndexOutOfBoundsException("id out of bounds");
             }
+
+            return values[ordinal];
         }
 
-        byte getId() {
-            return id;
+        @Override
+        public byte getId() {
+            int id = ordinal() + 1;
+            if (id < 0 || id > Byte.MAX_VALUE) {
+                throw new IndexOutOfBoundsException("ordinal out of bounds");
+            }
+
+            return (byte) id;
         }
 
-        String toString(ReadablePacketBuffer buf) {
+        public String toString(ReadablePacketBuffer buf) {
             return symbol + ":" + extractor.apply(buf);
         }
 
-        boolean isVarInt() {
-            switch (this) {
-                case VAR_I16:
-                case VAR_I32:
-                case VAR_I64:
-                case VAR_U16:
-                case VAR_U32:
-                case VAR_U64:
-                    return true;
-                default:
-                    return false;
-            }
+        public boolean hasVariableLength() {
+            return variableLength;
         }
 
-        int bitCount() {
-            switch (this) {
-                case I8:
-                case U8:
-                    return 8;
-                case VAR_I16:
-                case VAR_U16:
-                    return 16;
-                case VAR_I32:
-                case VAR_U32:
-                    return 32;
-                case VAR_I64:
-                case VAR_U64:
-                    return 64;
-                default:
-                    throw new RuntimeException(this + " is not an integer type");
-            }
+        public boolean hasDefinedByteCount() {
+            return byteCount >= 0;
         }
 
-        boolean isUnsigned() {
-            switch (this) {
-                case I8:
-                case VAR_I16:
-                case VAR_I32:
-                case VAR_I64:
-                    return false;
-                case U8:
-                case VAR_U16:
-                case VAR_U32:
-                case VAR_U64:
-                    return true;
-                default:
-                    throw new RuntimeException(this + " is not an integer type");
+        public int getByteCount() {
+            if (!hasDefinedByteCount()) {
+                throw new RuntimeException(this + " has no defined (maximum) byte count");
             }
+
+            return byteCount;
+        }
+
+        public boolean isInteger() {
+            return integer;
+        }
+
+        public boolean isSigned() {
+            if (!isInteger()) {
+                throw new RuntimeException(this + " is not an integer type");
+            }
+
+            return signed;
+        }
+
+        public boolean isVarInt() {
+            return hasVariableLength() && isInteger();
         }
     }
 }

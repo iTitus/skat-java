@@ -26,9 +26,7 @@ public class ConfirmJoinPacket implements ClientboundPacket {
             throw new IllegalStateException("expected connection state join");
         }
 
-        Platform.runLater(() -> skatClient.getCurrentGui()
-                .filter(gui -> gui instanceof JoiningGui)
-                .map(gui -> (JoiningGui) gui)
+        Platform.runLater(() -> skatClient.getCurrentGui(JoiningGui.class)
                 .ifPresentOrElse(gui -> gui.confirmJoin(gupid), () -> {
                     throw new IllegalStateException("Expected JoiningGui");
                 }));

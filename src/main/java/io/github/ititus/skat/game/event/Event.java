@@ -1,5 +1,6 @@
 package io.github.ititus.skat.game.event;
 
+import io.github.ititus.skat.SkatClient;
 import io.github.ititus.skat.game.gamestate.GameState;
 import io.github.ititus.skat.network.NetworkEnum;
 import io.github.ititus.skat.network.buffer.PacketBufferDeserializer;
@@ -21,7 +22,7 @@ public abstract class Event {
         return type;
     }
 
-    public abstract Optional<GameState> visit(GameState g);
+    public abstract Optional<GameState> visit(SkatClient c, GameState g);
 
     public enum Type implements NetworkEnum<Type>, PacketBufferDeserializer<Event> {
 
