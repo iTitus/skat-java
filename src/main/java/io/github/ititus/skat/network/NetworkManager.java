@@ -95,7 +95,10 @@ public class NetworkManager extends SimpleChannelInboundHandler<ClientboundPacke
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         System.out.println("NetworkManager.exceptionCaught");
 
+        System.out.flush();
         cause.printStackTrace();
+        System.err.flush();
+
         skatClient.disconnect("Error: " + cause);
     }
 

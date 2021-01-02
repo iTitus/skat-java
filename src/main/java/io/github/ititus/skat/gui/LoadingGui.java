@@ -12,7 +12,7 @@ public class LoadingGui extends Gui {
     public LoadingGui(String text) {
         this.loadingText = new Text(text);
 
-        HBox hb = new HBox(this.loadingText);
+        HBox hb = new HBox(10, this.loadingText);
         hb.setAlignment(Pos.CENTER);
 
         setMargin(hb, new Insets(10));

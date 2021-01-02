@@ -2,6 +2,7 @@ package io.github.ititus.skat;
 
 import io.github.ititus.skat.game.Player;
 import io.github.ititus.skat.game.gamestate.GameState;
+import io.github.ititus.skat.game.gamestate.NetworkGameState;
 import io.github.ititus.skat.gui.*;
 import io.github.ititus.skat.network.ConnectionState;
 import io.github.ititus.skat.network.NetworkManager;
@@ -181,6 +182,10 @@ public class SkatClient extends Application {
         return getCurrentGui(Gui.class);
     }
 
+    public GameState getGameState() {
+        return gameState;
+    }
+
     public void setup(byte gupid, String name) {
         player = new Player(gupid, name);
 
@@ -193,13 +198,13 @@ public class SkatClient extends Application {
         openGui(new ResyncGui());
     }
 
-    public void resync(GameState gameState, Byte2ObjectMap<Player> players) {
-        this.gameState = gameState;
-
+    public void resync(NetworkGameState ngs, Byte2ObjectMap<Player> players) {
         this.players.clear();
         this.players.putAll(players);
 
         this.player = this.players.get(this.player.getGupid());
+
+        this.gameState = ngs.get(this);
 
         networkManager.sendPacket(new ConfirmResyncPacket(),
                 f -> {

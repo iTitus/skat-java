@@ -1,6 +1,7 @@
 package io.github.ititus.skat.game.event;
 
 import io.github.ititus.skat.SkatClient;
+import io.github.ititus.skat.game.Player;
 import io.github.ititus.skat.game.gamestate.GameState;
 import io.github.ititus.skat.network.NetworkEnum;
 import io.github.ititus.skat.network.buffer.PacketBufferDeserializer;
@@ -12,14 +13,24 @@ public abstract class Event {
 
     private final Type type;
     private final long answerTo;
+    private final byte actingPlayer;
 
     protected Event(Type type, ReadablePacketBuffer buf) {
         this.type = type;
         answerTo = buf.readLong();
+        actingPlayer = buf.readByte();
     }
 
     public Type getType() {
         return type;
+    }
+
+    public long getAnswerTo() {
+        return answerTo;
+    }
+
+    public Player getActingPlayer(SkatClient c) {
+        return c.getPlayer(actingPlayer);
     }
 
     public abstract Optional<GameState> visit(SkatClient c, GameState g);

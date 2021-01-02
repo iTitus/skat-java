@@ -13,7 +13,6 @@ public class ActionPacket implements ServerboundPacket {
 
     @Override
     public void write(WritablePacketBuffer buf) {
-        buf.writeEnum(action.getType());
         action.write(buf);
     }
 

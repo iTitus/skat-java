@@ -103,6 +103,7 @@ public abstract class GameState {
     }
 
     public Optional<GameState> apply(SkatClient c, IllegalActionEvent e) {
+        c.disconnect("Illegal action");
         return Optional.empty();
     }
 

@@ -2,7 +2,6 @@ package io.github.ititus.skat.network.packet;
 
 import io.github.ititus.skat.SkatClient;
 import io.github.ititus.skat.game.Player;
-import io.github.ititus.skat.game.gamestate.GameState;
 import io.github.ititus.skat.game.gamestate.NetworkGameState;
 import io.github.ititus.skat.network.ConnectionState;
 import io.github.ititus.skat.network.NetworkManager;
@@ -16,12 +15,12 @@ import static io.github.ititus.skat.SkatClient.MAX_PLAYERS;
 
 public class ResyncPacket implements ClientboundPacket {
 
-    private final NetworkGameState gameState;
+    private final NetworkGameState networkGameState;
     private final byte[] activePlayerIndices;
     private final String[] playerNames;
 
     public ResyncPacket(ReadablePacketBuffer buf) {
-        gameState = new NetworkGameState(buf);
+        networkGameState = new NetworkGameState(buf);
 
         activePlayerIndices = new byte[MAX_PLAYERS];
         playerNames = new String[MAX_PLAYERS];
@@ -42,8 +41,6 @@ public class ResyncPacket implements ClientboundPacket {
             throw new IllegalStateException("expected connection state resync");
         }
 
-        GameState state = gameState.get(skatClient);
-
         Byte2ObjectMap<Player> players = new Byte2ObjectOpenHashMap<>();
         for (byte gupid = 0; gupid < MAX_PLAYERS; gupid++) {
             if (playerNames[gupid] != null) {
@@ -51,7 +48,7 @@ public class ResyncPacket implements ClientboundPacket {
             }
         }
 
-        Platform.runLater(() -> skatClient.resync(state, players));
+        Platform.runLater(() -> skatClient.resync(networkGameState, players));
     }
 
     @Override

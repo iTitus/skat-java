@@ -35,21 +35,21 @@ public class ConnectGui extends Gui {
         HBox buttonBox = new HBox(10, connectButton);
         buttonBox.setAlignment(Pos.CENTER);
 
-        VBox vb = new VBox(20, inputBox1, inputBox2, buttonBox);
-        vb.setAlignment(Pos.CENTER);
+        VBox centerBox = new VBox(20, inputBox1, inputBox2, buttonBox);
+        centerBox.setAlignment(Pos.CENTER);
 
-        setMargin(vb, new Insets(20));
-        setCenter(vb);
+        setMargin(centerBox, new Insets(20));
+        setCenter(centerBox);
 
         errorText = new Text();
         errorText.setFill(Color.RED);
         errorText.setVisible(false);
 
-        HBox hb = new HBox(errorText);
-        hb.setAlignment(Pos.CENTER);
+        HBox bottomBox = new HBox(10, errorText);
+        bottomBox.setAlignment(Pos.CENTER);
 
-        setMargin(hb, new Insets(10));
-        setBottom(hb);
+        setMargin(bottomBox, new Insets(10));
+        setBottom(bottomBox);
     }
 
     @Override

@@ -17,9 +17,11 @@ public class JoinGui extends Gui {
 
     public JoinGui() {
         Text t = new Text("Connection established!");
+        HBox topBox = new HBox(10, t);
+        topBox.setAlignment(Pos.CENTER);
 
-        setMargin(t, new Insets(10));
-        setTop(t);
+        setMargin(topBox, new Insets(10));
+        setTop(topBox);
 
         Text label1 = new Text("Name");
         nameField = new TextField("iTitus");
@@ -31,9 +33,9 @@ public class JoinGui extends Gui {
         HBox inputBox2 = new HBox(10, resumeBox);
         inputBox2.setAlignment(Pos.CENTER);
 
-        VBox vb = new VBox(10, inputBox1, inputBox2);
-        setMargin(vb, new Insets(10));
-        setCenter(vb);
+        VBox centerBox = new VBox(10, inputBox1, inputBox2);
+        setMargin(centerBox, new Insets(10));
+        setCenter(centerBox);
 
         Button disconnect = new Button("Disconnect");
         disconnect.setOnAction(event -> skatClient.disconnect("Disconnect"));
@@ -42,11 +44,11 @@ public class JoinGui extends Gui {
         join.setDefaultButton(true);
         join.setOnAction(event -> join());
 
-        HBox hb = new HBox(10, disconnect, join);
-        hb.setAlignment(Pos.CENTER);
+        HBox bottomBox = new HBox(10, disconnect, join);
+        bottomBox.setAlignment(Pos.CENTER);
 
-        setMargin(hb, new Insets(10));
-        setBottom(hb);
+        setMargin(bottomBox, new Insets(10));
+        setBottom(bottomBox);
     }
 
     private void join() {

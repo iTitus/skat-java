@@ -1,19 +1,19 @@
 package io.github.ititus.skat.gui;
 
+import io.github.ititus.skat.gui.ingame.IngameView;
+import io.github.ititus.skat.gui.ingame.SetupView;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.layout.HBox;
-import javafx.scene.text.Text;
 
 public class IngameGui extends Gui {
 
     public IngameGui() {
-        Text t = new Text("Ingame!");
+        openView(new SetupView());
+    }
 
-        HBox hb = new HBox(t);
-        hb.setAlignment(Pos.CENTER);
+    public void openView(IngameView view) {
+        view.setGui(this);
 
-        setMargin(hb, new Insets(10));
-        setCenter(hb);
+        setMargin(view, new Insets(10));
+        setCenter(view);
     }
 }
