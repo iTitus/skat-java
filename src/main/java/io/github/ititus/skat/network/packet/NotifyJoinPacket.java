@@ -15,6 +15,7 @@ public class NotifyJoinPacket implements ClientboundPacket {
 
     @Override
     public void handle(ChannelHandlerContext ctx, SkatClient skatClient) {
+        skatClient.onPlayerJoin(player);
     }
 
     @Override

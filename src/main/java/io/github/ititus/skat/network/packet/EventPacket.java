@@ -16,10 +16,7 @@ public class EventPacket implements ClientboundPacket {
 
     @Override
     public void handle(ChannelHandlerContext ctx, SkatClient skatClient) {
-        // TODO: handle (in another thread?)
-        if (event.getType() == Event.Type.ILLEGAL_ACTION) {
-            event.visit(skatClient, skatClient.getGameState());
-        }
+        skatClient.handleEvent(event);
     }
 
     @Override

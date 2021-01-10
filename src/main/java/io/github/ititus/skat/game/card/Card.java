@@ -3,11 +3,11 @@ package io.github.ititus.skat.game.card;
 import io.github.ititus.skat.game.gamestate.GameRules;
 import io.github.ititus.skat.network.NetworkEnum;
 import io.github.ititus.skat.network.buffer.ReadablePacketBuffer;
+import io.github.ititus.skat.util.Precondition;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectMap;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectOpenHashMap;
 
 import java.util.Comparator;
-import java.util.NoSuchElementException;
 
 import static io.github.ititus.skat.game.card.CardColor.*;
 import static io.github.ititus.skat.game.card.CardType.*;
@@ -76,6 +76,7 @@ public enum Card implements NetworkEnum<Card> {
 
     public static Card read(ReadablePacketBuffer buf) {
         short id = buf.readUnsignedByte();
+        Precondition.check(id, Byte.MAX_VALUE, Precondition.<Short>le());
         if (id > Byte.MAX_VALUE) {
             throw new IndexOutOfBoundsException("id too big");
         }
@@ -89,18 +90,14 @@ public enum Card implements NetworkEnum<Card> {
         }
 
         Card c = ID_MAP.get(id);
-        if (c == null) {
-            throw new NoSuchElementException("unknown card id " + id);
-        }
+        Precondition.checkNonNull(c);
 
         return c;
     }
 
     public static Card fromIndex(byte index) {
         Card[] values = values();
-        if (index < 0 || index >= values.length) {
-            throw new IndexOutOfBoundsException("unknown card index " + index);
-        }
+        Precondition.checkBounds(index, 0, values.length);
 
         return values[index];
     }

@@ -2,6 +2,7 @@ package io.github.ititus.skat.game.gamestate;
 
 import io.github.ititus.skat.SkatClient;
 import io.github.ititus.skat.network.buffer.ReadablePacketBuffer;
+import io.github.ititus.skat.util.Precondition;
 
 import java.util.Arrays;
 
@@ -12,9 +13,7 @@ public class ScoreBoard {
     private final long[] scores;
 
     private ScoreBoard(long[] scores) {
-        if (scores.length != MAX_PLAYERS) {
-            throw new IllegalArgumentException("length of scores array must be " + MAX_PLAYERS + " but was " + scores.length);
-        }
+        Precondition.checkEq(scores.length, MAX_PLAYERS);
 
         this.scores = scores;
     }
@@ -28,9 +27,7 @@ public class ScoreBoard {
     }
 
     public ScoreBoard addScore(long... scoreDeltas) {
-        if (scoreDeltas.length != MAX_PLAYERS) {
-            throw new IllegalArgumentException("length of scoreDeltas array must be " + MAX_PLAYERS);
-        }
+        Precondition.checkEq(scoreDeltas.length, MAX_PLAYERS);
 
         long[] scores = Arrays.copyOf(this.scores, SkatClient.MAX_PLAYERS);
         for (int gupid = 0; gupid < MAX_PLAYERS; gupid++) {

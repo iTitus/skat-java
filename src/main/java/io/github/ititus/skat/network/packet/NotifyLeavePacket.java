@@ -14,6 +14,7 @@ public class NotifyLeavePacket implements ClientboundPacket {
 
     @Override
     public void handle(ChannelHandlerContext ctx, SkatClient skatClient) {
+        skatClient.onPlayerLeave(gupid);
     }
 
     @Override

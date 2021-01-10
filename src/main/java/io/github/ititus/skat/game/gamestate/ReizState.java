@@ -2,6 +2,7 @@ package io.github.ititus.skat.game.gamestate;
 
 import io.github.ititus.skat.game.Player;
 import io.github.ititus.skat.network.NetworkEnum;
+import io.github.ititus.skat.util.Precondition;
 
 public final class ReizState {
 
@@ -31,9 +32,8 @@ public final class ReizState {
 
         public static Phase fromId(byte id) {
             Phase[] values = values();
-            if (id < 0 || id >= values.length) {
-                throw new IndexOutOfBoundsException("id out of bounds");
-            }
+
+            Precondition.checkBounds(id, 0, values.length);
 
             return values[id];
         }
@@ -41,9 +41,7 @@ public final class ReizState {
         @Override
         public byte getId() {
             int id = ordinal();
-            if (id > Byte.MAX_VALUE) {
-                throw new IndexOutOfBoundsException("ordinal out of bounds");
-            }
+            Precondition.check(id, Byte.MAX_VALUE, Precondition.<Integer>lt());
 
             return (byte) id;
         }

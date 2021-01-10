@@ -3,6 +3,7 @@ package io.github.ititus.skat.network;
 import io.github.ititus.skat.SkatClient;
 import io.github.ititus.skat.network.packet.ClientboundPacket;
 import io.github.ititus.skat.network.packet.ServerboundPacket;
+import io.github.ititus.skat.util.Precondition;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -21,7 +22,7 @@ import java.util.function.Consumer;
 
 public class NetworkManager extends SimpleChannelInboundHandler<ClientboundPacket> {
 
-    public static final int VERSION = 5;
+    public static final int VERSION = 6;
 
     public static final AttributeKey<ConnectionState> CONNECTION_STATE_KEY = AttributeKey.valueOf("state");
 
@@ -125,9 +126,7 @@ public class NetworkManager extends SimpleChannelInboundHandler<ClientboundPacke
     }
 
     public void sendPacket(ServerboundPacket p, GenericFutureListener<? extends Future<? super Void>> listener) {
-        if (!isChannelOpen()) {
-            throw new IllegalStateException("channel is closed");
-        }
+        Precondition.check(isChannelOpen(), "channel is closed");
 
         executeTask(() -> {
             ChannelFuture f = channelFuture.channel().writeAndFlush(p);

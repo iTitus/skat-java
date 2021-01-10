@@ -1,23 +1,22 @@
 package io.github.ititus.skat.game.event;
 
 import io.github.ititus.skat.SkatClient;
-import io.github.ititus.skat.game.card.CardCollection;
 import io.github.ititus.skat.game.gamestate.GameState;
 import io.github.ititus.skat.network.buffer.ReadablePacketBuffer;
 
 import java.util.Optional;
 
-public class DistributeCardsEvent extends Event {
+public class MessageEvent extends Event {
 
-    private final CardCollection hand;
+    private final String message;
 
-    public DistributeCardsEvent(ReadablePacketBuffer buf) {
-        super(Type.DISTRIBUTE_CARDS, buf);
-        hand = CardCollection.read(buf);
+    public MessageEvent(ReadablePacketBuffer buf) {
+        super(Type.MESSAGE, buf);
+        message = buf.readString();
     }
 
-    public CardCollection getHand() {
-        return hand;
+    public String getMessage() {
+        return message;
     }
 
     @Override

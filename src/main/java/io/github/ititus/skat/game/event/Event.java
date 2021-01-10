@@ -52,7 +52,8 @@ public abstract class Event {
         STICH_DONE(StichDoneEvent::new),
         ANNOUNCE_SCORES(AnnounceScoresEvent::new),
         ROUND_DONE(RoundDoneEvent::new),
-        GAME_CALLED(GameCalledEvent::new);
+        GAME_CALLED(GameCalledEvent::new),
+        MESSAGE(MessageEvent::new);
 
         private final PacketBufferDeserializer<? extends Event> deserializer;
 

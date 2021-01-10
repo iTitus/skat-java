@@ -3,6 +3,7 @@ package io.github.ititus.skat.network.buffer;
 import io.github.ititus.math.number.JavaMath;
 import io.github.ititus.skat.network.NetworkEnum;
 import io.github.ititus.skat.util.MathUtil;
+import io.github.ititus.skat.util.Precondition;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectFunction;
 import it.unimi.dsi.fastutil.bytes.ByteArrayList;
@@ -33,9 +34,7 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
 
     private void checkType(Type expected) {
         Type actual = Type.fromId(buf.readByte());
-        if (actual != expected) {
-            throw new RuntimeException("expected type " + expected + " but got " + actual);
-        }
+        Precondition.checkEq(actual, expected);
     }
 
     private void writeType(Type type) {
@@ -86,9 +85,7 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
 
     @Override
     public void writeString(String s) {
-        if (s.indexOf('\0') >= 0) {
-            throw new IllegalArgumentException("string may not contain null-characters");
-        }
+        Precondition.check(s.indexOf('\0') < 0, "string may not contain null characters");
 
         if (debugTypes) {
             writeType(Type.STR);
@@ -147,9 +144,9 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
 
     @Override
     public void writeUnsignedByte(short n) {
-        if (n < 0 || n > JavaMath.UNSIGNED_BYTE_MAX_VALUE) {
-            throw new ArithmeticException("Given integer " + n + " is not an unsigned byte");
-        } else if (debugTypes) {
+        Precondition.checkBoundsI(n, 0, JavaMath.UNSIGNED_BYTE_MAX_VALUE);
+
+        if (debugTypes) {
             writeType(Type.U8);
         }
 
@@ -157,9 +154,7 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
     }
 
     private long readVarInt(Type type) {
-        if (!type.isVarInt()) {
-            throw new IllegalArgumentException("given type " + type + " is not a var int type");
-        }
+        Precondition.check(type.isVarInt(), "given type " + type + " is not a var int type");
 
         if (debugTypes) {
             checkType(type);
@@ -184,22 +179,16 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
         } while ((b & 0b10000000) != 0);
 
         long result = (zigzag >>> 1) ^ -(zigzag & 1);
-        if (result > (1L << (bits - 1)) - 1 || result < -1L << (bits - 1)) {
-            throw new ArithmeticException("result integer " + result + " out of bounds for type " + type);
-        }
+        Precondition.checkBoundsI(result, (1L << (bits - 1)) - 1, -1L << (bits - 1));
 
         return result;
     }
 
     private void writeVarInt(Type type, long n) {
-        if (!type.isVarInt()) {
-            throw new IllegalArgumentException("given type " + type + " is not a var int type");
-        }
+        Precondition.check(type.isVarInt(), "given type " + type + " is not a var int type");
 
         int bits = 8 * type.getByteCount();
-        if (n > (1L << (bits - 1)) - 1 || n < -1L << (bits - 1)) {
-            throw new ArithmeticException("given integer " + n + " out of bounds for type " + type);
-        }
+        Precondition.checkBoundsI(n, (1L << (bits - 1)) - 1, -1L << (bits - 1));
 
         if (debugTypes) {
             writeType(type);
@@ -234,9 +223,7 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
 
     @Override
     public void writeUnsignedShort(int n) {
-        if (n < 0 || n > JavaMath.UNSIGNED_SHORT_MAX_VALUE) {
-            throw new ArithmeticException("Given integer " + n + " is not an unsigned short");
-        }
+        Precondition.checkBoundsI(n, 0, JavaMath.UNSIGNED_SHORT_MAX_VALUE);
 
         writeVarInt(Type.VAR_U16, (short) n);
     }
@@ -258,9 +245,7 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
 
     @Override
     public void writeUnsignedInt(long n) {
-        if (n < 0 || n > JavaMath.UNSIGNED_INT_MAX_VALUE) {
-            throw new ArithmeticException("Given integer " + n + " is not an unsigned int");
-        }
+        Precondition.checkBoundsI(n, 0, JavaMath.UNSIGNED_INT_MAX_VALUE);
 
         writeVarInt(Type.VAR_U32, (int) n);
     }
@@ -292,9 +277,7 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
 
     @Override
     public void writeUnsignedLong(BigInteger n) {
-        if (n.signum() < 0 || n.compareTo(JavaMath.UNSIGNED_LONG_MAX_VALUE) > 0) {
-            throw new ArithmeticException("Given integer " + n + " is not an unsigned long");
-        }
+        Precondition.checkBoundsI(n, BigInteger.ZERO, JavaMath.UNSIGNED_LONG_MAX_VALUE);
 
         writeVarInt(Type.VAR_U64, n.longValue());
     }
@@ -379,10 +362,9 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
 
         public static Type fromId(byte id) {
             Type[] values = values();
+            Precondition.checkBoundsI(id, 1, values.length);
+
             int ordinal = id - 1;
-            if (ordinal < 0 || ordinal >= values.length) {
-                throw new IndexOutOfBoundsException("id out of bounds");
-            }
 
             return values[ordinal];
         }
@@ -390,9 +372,7 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
         @Override
         public byte getId() {
             int id = ordinal() + 1;
-            if (id < 0 || id > Byte.MAX_VALUE) {
-                throw new IndexOutOfBoundsException("ordinal out of bounds");
-            }
+            Precondition.checkBoundsI(id, 0, Byte.MAX_VALUE);
 
             return (byte) id;
         }
@@ -410,9 +390,7 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
         }
 
         public int getByteCount() {
-            if (!hasDefinedByteCount()) {
-                throw new RuntimeException(this + " has no defined (maximum) byte count");
-            }
+            Precondition.check(hasDefinedByteCount());
 
             return byteCount;
         }
@@ -422,9 +400,7 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
         }
 
         public boolean isSigned() {
-            if (!isInteger()) {
-                throw new RuntimeException(this + " is not an integer type");
-            }
+            Precondition.check(isInteger());
 
             return signed;
         }

@@ -158,4 +158,8 @@ public abstract class GameState {
     public Optional<GameState> apply(SkatClient c, StichDoneEvent e) {
         return Optional.empty();
     }
+
+    public Optional<GameState> apply(SkatClient c, MessageEvent e) {
+        return Optional.of(this);
+    }
 }

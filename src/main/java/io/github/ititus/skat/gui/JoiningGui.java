@@ -2,6 +2,7 @@ package io.github.ititus.skat.gui;
 
 import io.github.ititus.skat.network.packet.JoinPacket;
 import io.github.ititus.skat.network.packet.ResumePacket;
+import io.github.ititus.skat.util.Precondition;
 
 public class JoiningGui extends LoadingGui {
 
@@ -20,17 +21,13 @@ public class JoiningGui extends LoadingGui {
     }
 
     public void confirmJoin(byte gupid) {
-        if (resume) {
-            throw new IllegalStateException("expected join");
-        }
+        Precondition.check(!resume, "expected join");
 
         confirm(gupid);
     }
 
     public void confirmResume(byte gupid) {
-        if (!resume) {
-            throw new IllegalStateException("expected resume");
-        }
+        Precondition.check(resume, "expected resume");
 
         confirm(gupid);
     }

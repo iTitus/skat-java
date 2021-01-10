@@ -3,6 +3,7 @@ package io.github.ititus.skat.game.action;
 import io.github.ititus.skat.network.NetworkEnum;
 import io.github.ititus.skat.network.buffer.PacketBufferSerializer;
 import io.github.ititus.skat.network.buffer.WritablePacketBuffer;
+import io.github.ititus.skat.util.Precondition;
 
 public abstract class Action implements PacketBufferSerializer {
 
@@ -34,14 +35,13 @@ public abstract class Action implements PacketBufferSerializer {
         SKAT_LEAVE,
         SKAT_PRESS,
         PLAY_CARD,
-        CALL_GAME;
+        CALL_GAME,
+        MESSAGE;
 
         @Override
         public byte getId() {
             int id = ordinal() + 1;
-            if (id < 0 || id > Byte.MAX_VALUE) {
-                throw new IndexOutOfBoundsException("ordinal out of bounds");
-            }
+            Precondition.checkBounds(id, 0, Byte.MAX_VALUE);
 
             return (byte) id;
         }

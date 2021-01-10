@@ -6,6 +6,7 @@ import io.github.ititus.skat.game.gamestate.NetworkGameState;
 import io.github.ititus.skat.network.ConnectionState;
 import io.github.ititus.skat.network.NetworkManager;
 import io.github.ititus.skat.network.buffer.ReadablePacketBuffer;
+import io.github.ititus.skat.util.Precondition;
 import io.netty.channel.ChannelHandlerContext;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectMap;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectOpenHashMap;
@@ -37,9 +38,7 @@ public class ResyncPacket implements ClientboundPacket {
 
     @Override
     public void handle(ChannelHandlerContext ctx, SkatClient skatClient) {
-        if (ctx.channel().attr(NetworkManager.CONNECTION_STATE_KEY).get() != ConnectionState.RESYNC) {
-            throw new IllegalStateException("expected connection state resync");
-        }
+        Precondition.checkEq(ctx.channel().attr(NetworkManager.CONNECTION_STATE_KEY).get(), ConnectionState.RESYNC);
 
         Byte2ObjectMap<Player> players = new Byte2ObjectOpenHashMap<>();
         for (byte gupid = 0; gupid < MAX_PLAYERS; gupid++) {

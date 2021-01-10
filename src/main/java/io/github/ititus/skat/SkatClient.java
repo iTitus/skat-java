@@ -1,6 +1,7 @@
 package io.github.ititus.skat;
 
 import io.github.ititus.skat.game.Player;
+import io.github.ititus.skat.game.event.Event;
 import io.github.ititus.skat.game.gamestate.GameState;
 import io.github.ititus.skat.game.gamestate.NetworkGameState;
 import io.github.ititus.skat.gui.*;
@@ -16,6 +17,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.util.Collection;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -68,11 +70,7 @@ public class SkatClient extends Application {
         Scene scene = stage.getScene();
         if (scene == null) {
             scene = new Scene(gui);
-            scene.setOnKeyPressed(event -> Optional.ofNullable(stage)
-                    .map(Stage::getScene)
-                    .map(Scene::getRoot)
-                    .filter(root -> root instanceof Gui)
-                    .map(root -> (Gui) root)
+            scene.setOnKeyPressed(event -> getCurrentGui()
                     .map(gui_ -> gui_.onKeyPressed(event))
                     .filter(Boolean::booleanValue)
                     .ifPresent(b -> event.consume())
@@ -257,10 +255,40 @@ public class SkatClient extends Application {
         }
 
         Player activePlayer = gameState.getActivePlayers()[ap];
-        if (activePlayer == null) {
-            throw new IllegalStateException("cannot get active player while not in a round");
+        if (activePlayer == null || activePlayer.getActivePlayerIndex() != ap) {
+            throw new IllegalStateException("error getting active player");
         }
 
         return activePlayer;
+    }
+
+    public Collection<Player> getPlayers() {
+        return players.values();
+    }
+
+    public void handleEvent(Event event) {
+        Optional<GameState> gameState = event.visit(this, this.gameState);
+        if (gameState.isEmpty()) {
+            disconnect("Error applying event " + event.getClass().getName());
+            return;
+        }
+
+        this.gameState = gameState.get();
+        Platform.runLater(() -> getCurrentGui(IngameGui.class).orElseThrow().handleEvent(event, this.gameState));
+    }
+
+    public void onPlayerJoin(Player player) {
+        players.put(player.getGupid(), player);
+        Platform.runLater(() -> getCurrentGui(IngameGui.class).orElseThrow().onPlayerJoin(player));
+    }
+
+    public void onPlayerLeave(byte gupid) {
+        Player oldPlayer = players.get(gupid);
+        if (oldPlayer == null) {
+            throw new IllegalStateException("unknown player with id " + gupid + " left");
+        }
+
+        players.put(gupid, oldPlayer.withName("<DISCONNECTED> " + oldPlayer.getName()));
+        Platform.runLater(() -> getCurrentGui(IngameGui.class).orElseThrow().onPlayerLeave(oldPlayer));
     }
 }
