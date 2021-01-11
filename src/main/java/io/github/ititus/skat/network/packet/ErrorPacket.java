@@ -4,8 +4,11 @@ import io.github.ititus.skat.SkatClient;
 import io.github.ititus.skat.network.NetworkEnum;
 import io.github.ititus.skat.network.buffer.ReadablePacketBuffer;
 import io.github.ititus.skat.network.buffer.WritablePacketBuffer;
-import io.github.ititus.skat.util.Precondition;
 import io.netty.channel.ChannelHandlerContext;
+
+import static io.github.ititus.skat.util.precondition.IntPrecondition.inBounds;
+import static io.github.ititus.skat.util.precondition.IntPrecondition.inBoundsInclusive;
+import static io.github.ititus.skat.util.precondition.Preconditions.check;
 
 public class ErrorPacket implements ClientboundPacket, ServerboundPacket {
 
@@ -55,7 +58,7 @@ public class ErrorPacket implements ClientboundPacket, ServerboundPacket {
         public static ConnectionErrorType fromId(byte id) {
             ConnectionErrorType[] values = values();
             int ordinal = id - 1;
-            Precondition.checkBounds(ordinal, 0, values.length);
+            check(ordinal, inBounds(values.length));
 
             return values[ordinal];
         }
@@ -63,7 +66,7 @@ public class ErrorPacket implements ClientboundPacket, ServerboundPacket {
         @Override
         public byte getId() {
             int id = ordinal() + 1;
-            Precondition.checkBoundsI(id, 0, Byte.MAX_VALUE);
+            check(id, inBoundsInclusive(Byte.MAX_VALUE));
 
             return (byte) id;
         }

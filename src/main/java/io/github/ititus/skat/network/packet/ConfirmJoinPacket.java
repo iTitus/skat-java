@@ -5,9 +5,11 @@ import io.github.ititus.skat.gui.JoiningGui;
 import io.github.ititus.skat.network.ConnectionState;
 import io.github.ititus.skat.network.NetworkManager;
 import io.github.ititus.skat.network.buffer.ReadablePacketBuffer;
-import io.github.ititus.skat.util.Precondition;
 import io.netty.channel.ChannelHandlerContext;
 import javafx.application.Platform;
+
+import static io.github.ititus.skat.util.precondition.Precondition.equalTo;
+import static io.github.ititus.skat.util.precondition.Preconditions.check;
 
 public class ConfirmJoinPacket implements ClientboundPacket {
 
@@ -23,7 +25,7 @@ public class ConfirmJoinPacket implements ClientboundPacket {
 
     @Override
     public void handle(ChannelHandlerContext ctx, SkatClient skatClient) {
-        Precondition.checkEq(ctx.channel().attr(NetworkManager.CONNECTION_STATE_KEY).get(), ConnectionState.JOIN);
+        check(ctx.channel().attr(NetworkManager.CONNECTION_STATE_KEY).get(), equalTo(ConnectionState.JOIN));
 
         Platform.runLater(() -> skatClient.getCurrentGui(JoiningGui.class)
                 .ifPresentOrElse(gui -> gui.confirmJoin(gupid), () -> {

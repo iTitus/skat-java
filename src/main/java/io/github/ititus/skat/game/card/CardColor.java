@@ -1,7 +1,10 @@
 package io.github.ititus.skat.game.card;
 
 import io.github.ititus.skat.network.NetworkEnum;
-import io.github.ititus.skat.util.Precondition;
+
+import static io.github.ititus.skat.util.precondition.IntPrecondition.inBounds;
+import static io.github.ititus.skat.util.precondition.IntPrecondition.inBoundsInclusive;
+import static io.github.ititus.skat.util.precondition.Preconditions.check;
 
 public enum CardColor implements NetworkEnum<CardColor> {
 
@@ -13,13 +16,12 @@ public enum CardColor implements NetworkEnum<CardColor> {
     public static CardColor fromId(byte id) {
         CardColor[] values = values();
 
-        Precondition.checkBounds(id, 0, values.length + 1);
-
         int ordinal = id - 1;
         if (ordinal == -1) {
             return null;
         }
 
+        check(id, inBounds(values.length));
         return values[ordinal];
     }
 
@@ -27,8 +29,7 @@ public enum CardColor implements NetworkEnum<CardColor> {
     public byte getId() {
         int id = ordinal() + 1;
 
-        Precondition.checkBounds(id, 0, Byte.MAX_VALUE);
-
+        check(id, inBoundsInclusive(Byte.MAX_VALUE));
         return (byte) id;
     }
 }

@@ -6,11 +6,13 @@ import io.github.ititus.skat.game.card.CardCollection;
 import io.github.ititus.skat.game.card.Stich;
 import io.github.ititus.skat.game.event.DistributeCardsEvent;
 import io.github.ititus.skat.game.event.StartRoundEvent;
-import io.github.ititus.skat.util.Precondition;
 
 import java.util.Optional;
 
 import static io.github.ititus.skat.SkatClient.ACTIVE_PLAYERS;
+import static io.github.ititus.skat.util.precondition.Precondition.isNull;
+import static io.github.ititus.skat.util.precondition.Precondition.notNull;
+import static io.github.ititus.skat.util.precondition.Preconditions.check;
 
 public class GameStateBetweenRounds extends GameState {
 
@@ -23,8 +25,8 @@ public class GameStateBetweenRounds extends GameState {
 
     @Override
     public Optional<GameState> apply(SkatClient c, StartRoundEvent e) {
-        Precondition.checkNull(activePlayers);
-        Precondition.checkNull(hand);
+        check(activePlayers, isNull());
+        check(hand, isNull());
 
         byte[] activePlayersGupid = e.getActivePlayers();
         c.setActivePlayerIndices(activePlayersGupid);
@@ -52,8 +54,8 @@ public class GameStateBetweenRounds extends GameState {
 
     @Override
     public Optional<GameState> apply(SkatClient c, DistributeCardsEvent e) {
-        Precondition.checkNonNull(activePlayers);
-        Precondition.checkNull(hand);
+        check(activePlayers, notNull());
+        check(hand, isNull());
 
         return Optional.of(new GameStateReizen(
                 new ReizState(

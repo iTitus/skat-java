@@ -3,7 +3,6 @@ package io.github.ititus.skat.game.card;
 import io.github.ititus.skat.game.gamestate.GameRules;
 import io.github.ititus.skat.network.NetworkEnum;
 import io.github.ititus.skat.network.buffer.ReadablePacketBuffer;
-import io.github.ititus.skat.util.Precondition;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectMap;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectOpenHashMap;
 
@@ -11,6 +10,10 @@ import java.util.Comparator;
 
 import static io.github.ititus.skat.game.card.CardColor.*;
 import static io.github.ititus.skat.game.card.CardType.*;
+import static io.github.ititus.skat.util.precondition.IntPrecondition.inBounds;
+import static io.github.ititus.skat.util.precondition.IntPrecondition.inBoundsInclusive;
+import static io.github.ititus.skat.util.precondition.Precondition.notNull;
+import static io.github.ititus.skat.util.precondition.Preconditions.check;
 
 public enum Card implements NetworkEnum<Card> {
 
@@ -76,10 +79,7 @@ public enum Card implements NetworkEnum<Card> {
 
     public static Card read(ReadablePacketBuffer buf) {
         short id = buf.readUnsignedByte();
-        Precondition.check(id, Byte.MAX_VALUE, Precondition.<Short>le());
-        if (id > Byte.MAX_VALUE) {
-            throw new IndexOutOfBoundsException("id too big");
-        }
+        check(id, inBoundsInclusive(Byte.MAX_VALUE));
 
         return fromId((byte) id);
     }
@@ -90,15 +90,14 @@ public enum Card implements NetworkEnum<Card> {
         }
 
         Card c = ID_MAP.get(id);
-        Precondition.checkNonNull(c);
+        check(c, notNull());
 
         return c;
     }
 
     public static Card fromIndex(byte index) {
         Card[] values = values();
-        Precondition.checkBounds(index, 0, values.length);
-
+        check(index, inBounds(values.length));
         return values[index];
     }
 

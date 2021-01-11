@@ -3,7 +3,9 @@ package io.github.ititus.skat.game.action;
 import io.github.ititus.skat.network.NetworkEnum;
 import io.github.ititus.skat.network.buffer.PacketBufferSerializer;
 import io.github.ititus.skat.network.buffer.WritablePacketBuffer;
-import io.github.ititus.skat.util.Precondition;
+
+import static io.github.ititus.skat.util.precondition.IntPrecondition.inBounds;
+import static io.github.ititus.skat.util.precondition.Preconditions.check;
 
 public abstract class Action implements PacketBufferSerializer {
 
@@ -41,7 +43,7 @@ public abstract class Action implements PacketBufferSerializer {
         @Override
         public byte getId() {
             int id = ordinal() + 1;
-            Precondition.checkBounds(id, 0, Byte.MAX_VALUE);
+            check(id, inBounds(Byte.MAX_VALUE));
 
             return (byte) id;
         }

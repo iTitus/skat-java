@@ -2,9 +2,11 @@ package io.github.ititus.skat.network.packet;
 
 import io.github.ititus.skat.network.buffer.PacketBufferDeserializer;
 import io.github.ititus.skat.network.buffer.ReadablePacketBuffer;
-import io.github.ititus.skat.util.Precondition;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectMap;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectOpenHashMap;
+
+import static io.github.ititus.skat.util.precondition.Precondition.notNull;
+import static io.github.ititus.skat.util.precondition.Preconditions.check;
 
 public enum ClientboundPacketType implements PacketBufferDeserializer<ClientboundPacket> {
 
@@ -37,8 +39,7 @@ public enum ClientboundPacketType implements PacketBufferDeserializer<Clientboun
 
     public static ClientboundPacketType fromId(byte id) {
         ClientboundPacketType type = ID_MAP.get(id);
-        Precondition.checkNonNull(type);
-
+        check(type, notNull());
         return type;
     }
 

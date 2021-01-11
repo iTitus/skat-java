@@ -4,11 +4,13 @@ import io.github.ititus.skat.SkatClient;
 import io.github.ititus.skat.game.gamestate.GameState;
 import io.github.ititus.skat.network.NetworkEnum;
 import io.github.ititus.skat.network.buffer.ReadablePacketBuffer;
-import io.github.ititus.skat.util.Precondition;
 
 import java.util.Optional;
 
 import static io.github.ititus.skat.SkatClient.ACTIVE_PLAYERS;
+import static io.github.ititus.skat.util.precondition.IntPrecondition.inBounds;
+import static io.github.ititus.skat.util.precondition.IntPrecondition.inBoundsInclusive;
+import static io.github.ititus.skat.util.precondition.Preconditions.check;
 
 public class AnnounceScoresEvent extends Event {
 
@@ -60,7 +62,7 @@ public class AnnounceScoresEvent extends Event {
         public static LossType fromId(byte id) {
             LossType[] values = values();
             int ordinal = id - 1;
-            Precondition.checkBounds(ordinal, 0, values.length + 1);
+            check(ordinal, inBounds(values.length));
 
             return values[ordinal];
         }
@@ -68,7 +70,7 @@ public class AnnounceScoresEvent extends Event {
         @Override
         public byte getId() {
             int id = ordinal() + 1;
-            Precondition.checkBounds(id, 0, Byte.MAX_VALUE);
+            check(id, inBoundsInclusive(Byte.MAX_VALUE));
 
             return (byte) id;
         }

@@ -3,7 +3,6 @@ package io.github.ititus.skat.network;
 import io.github.ititus.skat.SkatClient;
 import io.github.ititus.skat.network.packet.ClientboundPacket;
 import io.github.ititus.skat.network.packet.ServerboundPacket;
-import io.github.ititus.skat.util.Precondition;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -19,6 +18,9 @@ import io.netty.util.concurrent.GenericFutureListener;
 import java.net.InetSocketAddress;
 import java.util.Optional;
 import java.util.function.Consumer;
+
+import static io.github.ititus.skat.util.precondition.BooleanPrecondition.isTrue;
+import static io.github.ititus.skat.util.precondition.Preconditions.check;
 
 public class NetworkManager extends SimpleChannelInboundHandler<ClientboundPacket> {
 
@@ -126,7 +128,7 @@ public class NetworkManager extends SimpleChannelInboundHandler<ClientboundPacke
     }
 
     public void sendPacket(ServerboundPacket p, GenericFutureListener<? extends Future<? super Void>> listener) {
-        Precondition.check(isChannelOpen(), "channel is closed");
+        check(isChannelOpen(), isTrue());
 
         executeTask(() -> {
             ChannelFuture f = channelFuture.channel().writeAndFlush(p);

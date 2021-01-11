@@ -23,9 +23,8 @@ import java.util.stream.Collectors;
 public class IngameGui extends Gui {
 
     private static final KeyCodeCombination SEND_KEYBIND = new KeyCodeCombination(KeyCode.ENTER);
-
-    private IngameView view;
     private final Bottom bottom;
+    private IngameView view;
 
     public IngameGui() {
         openView(new SetupView());

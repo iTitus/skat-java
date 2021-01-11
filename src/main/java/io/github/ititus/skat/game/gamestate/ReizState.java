@@ -2,7 +2,10 @@ package io.github.ititus.skat.game.gamestate;
 
 import io.github.ititus.skat.game.Player;
 import io.github.ititus.skat.network.NetworkEnum;
-import io.github.ititus.skat.util.Precondition;
+
+import static io.github.ititus.skat.util.precondition.IntPrecondition.inBounds;
+import static io.github.ititus.skat.util.precondition.IntPrecondition.inBoundsInclusive;
+import static io.github.ititus.skat.util.precondition.Preconditions.check;
 
 public final class ReizState {
 
@@ -32,17 +35,14 @@ public final class ReizState {
 
         public static Phase fromId(byte id) {
             Phase[] values = values();
-
-            Precondition.checkBounds(id, 0, values.length);
-
+            check(id, inBounds(values.length));
             return values[id];
         }
 
         @Override
         public byte getId() {
             int id = ordinal();
-            Precondition.check(id, Byte.MAX_VALUE, Precondition.<Integer>lt());
-
+            check(id, inBoundsInclusive(Byte.MAX_VALUE));
             return (byte) id;
         }
     }

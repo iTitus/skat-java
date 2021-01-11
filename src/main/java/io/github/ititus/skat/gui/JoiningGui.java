@@ -2,7 +2,10 @@ package io.github.ititus.skat.gui;
 
 import io.github.ititus.skat.network.packet.JoinPacket;
 import io.github.ititus.skat.network.packet.ResumePacket;
-import io.github.ititus.skat.util.Precondition;
+
+import static io.github.ititus.skat.util.precondition.BooleanPrecondition.isFalse;
+import static io.github.ititus.skat.util.precondition.BooleanPrecondition.isTrue;
+import static io.github.ititus.skat.util.precondition.Preconditions.check;
 
 public class JoiningGui extends LoadingGui {
 
@@ -21,13 +24,13 @@ public class JoiningGui extends LoadingGui {
     }
 
     public void confirmJoin(byte gupid) {
-        Precondition.check(!resume, "expected join");
+        check(resume, isFalse());
 
         confirm(gupid);
     }
 
     public void confirmResume(byte gupid) {
-        Precondition.check(resume, "expected resume");
+        check(resume, isTrue());
 
         confirm(gupid);
     }
