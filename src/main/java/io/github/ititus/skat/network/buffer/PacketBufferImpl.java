@@ -340,32 +340,30 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
 
     enum Type implements NetworkEnum<Type> {
 
-        I8("i8", ReadablePacketBuffer::readByte, 1, false, true, true),
-        U8("u8", ReadablePacketBuffer::readUnsignedByte, 1, false, true, false),
-        VAR_I16("i16", ReadablePacketBuffer::readShort, 2, true, true, true),
-        VAR_I32("i32", ReadablePacketBuffer::readInt, 4, true, true, true),
-        VAR_I64("i64", ReadablePacketBuffer::readLong, 8, true, true, true),
-        VAR_U16("u16", ReadablePacketBuffer::readUnsignedShort, 2, true, true, false),
-        VAR_U32("u32", ReadablePacketBuffer::readUnsignedInt, 4, true, true, false),
-        VAR_U64("u64", ReadablePacketBuffer::readUnsignedLong, 8, true, true, false),
-        BOOL("b", ReadablePacketBuffer::readBoolean, 1, false, false, false),
-        STR("s", buf -> "'" + buf.readString() + "'", -1, true, false, false);
+        I8("i8", ReadablePacketBuffer::readByte, 1, false, true),
+        U8("u8", ReadablePacketBuffer::readUnsignedByte, 1, false, true),
+        VAR_I16("i16", ReadablePacketBuffer::readShort, 2, true, true),
+        VAR_I32("i32", ReadablePacketBuffer::readInt, 4, true, true),
+        VAR_I64("i64", ReadablePacketBuffer::readLong, 8, true, true),
+        VAR_U16("u16", ReadablePacketBuffer::readUnsignedShort, 2, true, true),
+        VAR_U32("u32", ReadablePacketBuffer::readUnsignedInt, 4, true, true),
+        VAR_U64("u64", ReadablePacketBuffer::readUnsignedLong, 8, true, true),
+        BOOL("b", ReadablePacketBuffer::readBoolean, 1, false, false),
+        STR("s", buf -> "'" + buf.readString() + "'", -1, true, false);
 
         private final String symbol;
         private final Function<ReadablePacketBuffer, ?> extractor;
         private final int byteCount;
         private final boolean variableLength;
         private final boolean integer;
-        private final boolean signed;
 
         Type(String symbol, Function<ReadablePacketBuffer, ?> extractor, int byteCount, boolean variableLength,
-             boolean integer, boolean signed) {
+             boolean integer) {
             this.symbol = symbol;
             this.extractor = extractor;
             this.byteCount = byteCount;
             this.variableLength = variableLength;
             this.integer = integer;
-            this.signed = signed;
         }
 
         public static Type fromId(byte id) {
@@ -404,12 +402,6 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
 
         public boolean isInteger() {
             return integer;
-        }
-
-        public boolean isSigned() {
-            check(isInteger(), isTrue());
-
-            return signed;
         }
 
         public boolean isVarInt() {

@@ -56,9 +56,12 @@ public class NetworkManager extends SimpleChannelInboundHandler<ClientboundPacke
                                 .addLast("length_decoder",
                                         new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4, 0, 4))
                                 .addLast("packet_decoder", new PacketDecoder())
-                                .addLast("length_encoder", new LengthFieldPrepender(4))
-                                .addLast("packet_encoder", new PacketEncoder())
                                 .addLast("packet_handler", NetworkManager.this);
+
+                        ch.pipeline()
+                                .addLast("length_encoder", new LengthFieldPrepender(4))
+                                .addLast("packet_encoder", new PacketEncoder());
+
                     }
                 })
                 .connect();

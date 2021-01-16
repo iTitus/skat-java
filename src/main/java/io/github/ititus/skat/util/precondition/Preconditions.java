@@ -36,6 +36,7 @@ public final class Preconditions {
     }
 
     public static <T> void check(T value, Precondition<T> precondition) {
+        Objects.requireNonNull(precondition);
         doCheck(() -> precondition.test(value), () -> precondition.getFailDescription(value));
     }
 
