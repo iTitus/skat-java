@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 public class IngameGui extends Gui {
 
     private static final KeyCodeCombination SEND_KEYBIND = new KeyCodeCombination(KeyCode.ENTER);
+
     private final Bottom bottom;
     private IngameView view;
 
@@ -64,17 +65,17 @@ public class IngameGui extends Gui {
     }
 
     public void onPlayerJoin(Player player) {
-        System.out.println(player + " has joined the game");
+        bottom.showMessage(player + " has joined the game");
         bottom.refresh();
     }
 
     public void onPlayerLeave(Player player) {
-        System.out.println(player + " has left the game");
+        bottom.showMessage(player + " has left the game");
         bottom.refresh();
     }
 
     public void onMessage(Player p, String message) {
-        bottom.onMessage(p, message);
+        bottom.showMessage(p, message);
     }
 
     private class Bottom extends HBox {
@@ -144,12 +145,18 @@ public class IngameGui extends Gui {
             skatClient.getNetworkManager().sendPacket(new ActionPacket(new MessageAction(-1, message)));
         }
 
-        private void onMessage(Player p, String message) {
+        private void showMessage(Player p, String message) {
+            showMessage("<" + p.getName() + "> " + message);
+        }
+
+        private void showMessage(String message) {
+            System.out.println("CHAT: " + message);
+
             if (!chat.getText().isBlank()) {
                 chat.appendText("\n");
             }
 
-            chat.appendText("<" + p.getName() + "> " + message);
+            chat.appendText(message);
         }
     }
 }
