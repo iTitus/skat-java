@@ -1,7 +1,7 @@
 package io.github.ititus.skat.util.precondition;
 
-import io.github.ititus.skat.util.function.BooleanFunction;
-import io.github.ititus.skat.util.function.BooleanPredicate;
+import io.github.ititus.function.BooleanFunction;
+import io.github.ititus.function.BooleanPredicate;
 
 public final class BooleanPrecondition {
 

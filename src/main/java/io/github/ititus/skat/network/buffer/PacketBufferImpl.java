@@ -2,7 +2,6 @@ package io.github.ititus.skat.network.buffer;
 
 import io.github.ititus.math.number.JavaMath;
 import io.github.ititus.skat.network.NetworkEnum;
-import io.github.ititus.skat.util.MathUtil;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectFunction;
 import it.unimi.dsi.fastutil.bytes.ByteArrayList;
@@ -169,7 +168,7 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
         }
 
         int bits = 8 * type.getByteCount();
-        int maxBytes = MathUtil.ceilDiv(bits, 7);
+        int maxBytes = JavaMath.ceilDiv(bits, 7);
         int superfluousBits = 7 * maxBytes - bits;
         int mask = -1 << 7 - superfluousBits;
 
