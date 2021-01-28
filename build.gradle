@@ -10,11 +10,15 @@ group = 'io.github.ititus'
 version = '1.0.0'
 
 wrapper {
-    gradleVersion '6.5.1'
+    gradleVersion '6.8.1'
 }
 
 java {
     sourceCompatibility = targetCompatibility = JavaVersion.VERSION_15
+}
+
+modularity {
+    disableEffectiveArgumentsAdjustment()
 }
 
 application {
