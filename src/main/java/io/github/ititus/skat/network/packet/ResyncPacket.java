@@ -11,9 +11,9 @@ import it.unimi.dsi.fastutil.bytes.Byte2ObjectMap;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectOpenHashMap;
 import javafx.application.Platform;
 
+import static io.github.ititus.precondition.Precondition.equalTo;
+import static io.github.ititus.precondition.Preconditions.check;
 import static io.github.ititus.skat.SkatClient.MAX_PLAYERS;
-import static io.github.ititus.skat.util.precondition.Precondition.equalTo;
-import static io.github.ititus.skat.util.precondition.Preconditions.check;
 
 public class ResyncPacket implements ClientboundPacket {
 

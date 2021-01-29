@@ -12,14 +12,14 @@ import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.function.Function;
 
-import static io.github.ititus.skat.util.precondition.BooleanPrecondition.isTrue;
-import static io.github.ititus.skat.util.precondition.ComparablePrecondition.inBoundsInclusive;
-import static io.github.ititus.skat.util.precondition.IntPrecondition.inBounds;
-import static io.github.ititus.skat.util.precondition.IntPrecondition.inBoundsInclusive;
-import static io.github.ititus.skat.util.precondition.LongPrecondition.inBoundsInclusive;
-import static io.github.ititus.skat.util.precondition.Precondition.equalTo;
-import static io.github.ititus.skat.util.precondition.Preconditions.check;
-import static io.github.ititus.skat.util.precondition.StringPrecondition.notContains;
+import static io.github.ititus.precondition.BooleanPrecondition.isTrue;
+import static io.github.ititus.precondition.ComparablePrecondition.inBoundsInclusive;
+import static io.github.ititus.precondition.IntPrecondition.inBounds;
+import static io.github.ititus.precondition.IntPrecondition.inBoundsInclusive;
+import static io.github.ititus.precondition.LongPrecondition.inBoundsInclusive;
+import static io.github.ititus.precondition.Precondition.equalTo;
+import static io.github.ititus.precondition.Preconditions.check;
+import static io.github.ititus.precondition.StringPrecondition.notContains;
 
 public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuffer {
 

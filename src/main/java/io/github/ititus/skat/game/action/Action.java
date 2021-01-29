@@ -4,8 +4,8 @@ import io.github.ititus.skat.network.NetworkEnum;
 import io.github.ititus.skat.network.buffer.PacketBufferSerializer;
 import io.github.ititus.skat.network.buffer.WritablePacketBuffer;
 
-import static io.github.ititus.skat.util.precondition.IntPrecondition.inBounds;
-import static io.github.ititus.skat.util.precondition.Preconditions.check;
+import static io.github.ititus.precondition.IntPrecondition.inBounds;
+import static io.github.ititus.precondition.Preconditions.check;
 
 public abstract class Action implements PacketBufferSerializer {
 

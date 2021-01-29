@@ -7,10 +7,10 @@ import io.github.ititus.skat.network.buffer.ReadablePacketBuffer;
 
 import java.util.Optional;
 
+import static io.github.ititus.precondition.IntPrecondition.inBounds;
+import static io.github.ititus.precondition.IntPrecondition.inBoundsInclusive;
+import static io.github.ititus.precondition.Preconditions.check;
 import static io.github.ititus.skat.SkatClient.ACTIVE_PLAYERS;
-import static io.github.ititus.skat.util.precondition.IntPrecondition.inBounds;
-import static io.github.ititus.skat.util.precondition.IntPrecondition.inBoundsInclusive;
-import static io.github.ititus.skat.util.precondition.Preconditions.check;
 
 public class AnnounceScoresEvent extends Event {
 
