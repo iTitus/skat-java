@@ -35,7 +35,7 @@ repositories {
 
 dependencies {
     implementation 'io.github.ititus:ititus-commons:1.4.0'
-    implementation 'it.unimi.dsi:fastutil:8.5.1'
+    implementation 'it.unimi.dsi:fastutil:8.5.2'
     implementation 'io.netty:netty-all:4.1.58.Final'
 
     testImplementation platform('org.junit:junit-bom:5.7.0')
