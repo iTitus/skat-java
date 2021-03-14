@@ -1,4 +1,6 @@
 module io.github.ititus.skat {
+    requires java.base;
+
     requires ititus.commons;
 
     requires it.unimi.dsi.fastutil;
