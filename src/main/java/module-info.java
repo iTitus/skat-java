@@ -1,12 +1,7 @@
 module io.github.ititus.skat {
-    requires java.base;
-
-    requires ititus.commons;
-
+    requires io.github.ititus.commons;
     requires it.unimi.dsi.fastutil;
-
     requires io.netty.all;
-
     requires javafx.base;
     requires javafx.controls;
     requires javafx.graphics;
