@@ -1,7 +1,7 @@
 plugins {
     id 'java'
     id 'application'
-    id 'org.javamodularity.moduleplugin' version '1.8.1'
+    id 'org.javamodularity.moduleplugin' version '1.8.2'
     id 'org.openjfx.javafxplugin' version '0.0.9'
     id 'org.beryx.jlink' version '2.23.7'
 }
@@ -48,19 +48,8 @@ dependencies {
     testImplementation 'org.mockito:mockito-core:3.9.0'
 }
 
-compileTestJava {
-    moduleOptions {
-        addModules = ['org.junit.jupiter.params']
-        addReads = ['io.github.ititus.skat': 'org.junit.jupiter.params']
-    }
-}
-
 test {
     useJUnitPlatform()
-
-    moduleOptions {
-        addReads = ['io.github.ititus.skat': 'org.junit.jupiter.params']
-    }
 }
 
 javafx {
