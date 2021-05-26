@@ -35,7 +35,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'io.github.ititus:ititus-commons:1.5.2'
+    implementation 'io.github.ititus:ititus-commons:1.5.3'
     /*implementation 'it.unimi.dsi:fastutil-core:8.5.4'
     implementation 'it.unimi.dsi:fastutil-extra:8.5.4'
     implementation 'it.unimi.dsi:fastutil:8.5.4'*/
