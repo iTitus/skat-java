@@ -175,7 +175,8 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
         long zigzag = 0;
         int usedBytes = 0;
         byte b;
-        do {
+        do
+        {
             b = buf.readByte();
             int data = b & 0b01111111;
             if (usedBytes == maxBytes - 1 && (data & mask) != 0) {
@@ -202,7 +203,8 @@ public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuf
         }
 
         long zigzag = (n >> (Long.SIZE - 1)) ^ (n << 1);
-        do {
+        do
+        {
             int data = (int) (zigzag & 0b01111111);
             zigzag = zigzag >>> 7;
             if (zigzag != 0) {
