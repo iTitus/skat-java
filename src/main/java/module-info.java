@@ -1,8 +1,5 @@
 module io.github.ititus.skat {
     requires io.github.ititus.commons;
-    /*requires it.unimi.dsi.fastutil.core;
-    requires it.unimi.dsi.fastutil.extra;
-    requires it.unimi.dsi.fastutil;*/
     requires it.unimi.dsi.fastutil;
     requires io.netty.all;
     requires javafx.base;

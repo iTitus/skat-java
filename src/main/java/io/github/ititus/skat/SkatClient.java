@@ -78,8 +78,7 @@ public class SkatClient extends Application {
             stage.setScene(scene);
         } else {
             Parent oldRoot = scene.getRoot();
-            if (oldRoot instanceof Gui) {
-                Gui oldGui = (Gui) oldRoot;
+            if (oldRoot instanceof Gui oldGui) {
                 if (!replace) {
                     gui.setPreviousGui(oldGui.getGuiForPrevious());
                 }

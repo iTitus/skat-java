@@ -18,8 +18,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
-import java.util.stream.Collectors;
-
 public class IngameGui extends Gui {
 
     private static final KeyCodeCombination SEND_KEYBIND = new KeyCodeCombination(KeyCode.ENTER);
@@ -51,6 +49,7 @@ public class IngameGui extends Gui {
     }
 
     public void handleEvent(Event e, GameState gameState) {
+        System.out.println("received event " + e.getType());
         if (e.getType() == Event.Type.MESSAGE) {
             onMessage(e.getActingPlayer(skatClient), ((MessageEvent) e).getMessage());
             return;
@@ -103,6 +102,8 @@ public class IngameGui extends Gui {
                 }
             });
 
+            VBox chatAndSendBox = new VBox(chat, new HBox(chatInput, sendButton));
+
             playerListView = new ListView<>();
             playerListView.setEditable(false);
             playerListView.setCellFactory(listView -> {
@@ -122,15 +123,16 @@ public class IngameGui extends Gui {
                 cell.setEditable(false);
                 return cell;
             });
+            playerListView.prefHeightProperty().bind(chatAndSendBox.heightProperty());
 
-            getChildren().addAll(playerListView, new VBox(chat, new HBox(chatInput, sendButton)));
+            getChildren().addAll(playerListView, chatAndSendBox);
         }
 
         private void refresh() {
             playerListView.setItems(FXCollections.observableList(
                     skatClient.getPlayers().stream()
                             .sorted(Player.ACTIVE_COMPARATOR)
-                            .collect(Collectors.toUnmodifiableList())
+                            .toList()
             ));
         }
 

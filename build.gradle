@@ -10,7 +10,7 @@ group = 'io.github.ititus'
 version = '1.0.0'
 
 wrapper {
-    gradleVersion '7.1'
+    gradleVersion '7.2'
 }
 
 java {
@@ -36,9 +36,6 @@ repositories {
 
 dependencies {
     implementation 'io.github.ititus:ititus-commons:1.5.9'
-    /*implementation 'it.unimi.dsi:fastutil-core:8.5.4'
-    implementation 'it.unimi.dsi:fastutil-extra:8.5.4'
-    implementation 'it.unimi.dsi:fastutil:8.5.4'*/
     implementation 'it.unimi.dsi:fastutil:8.5.6'
     implementation 'io.netty:netty-all:4.1.68.Final'
 
