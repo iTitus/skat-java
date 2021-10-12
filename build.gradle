@@ -63,4 +63,7 @@ jlink {
     launcher {
         name = 'skat'
     }
+    mergedModule {
+        excludeProvides servicePattern: 'reactor.blockhound.*'
+    }
 }
