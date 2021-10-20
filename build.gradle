@@ -3,7 +3,7 @@ plugins {
     id 'application'
     id 'org.javamodularity.moduleplugin' version '1.8.10'
     id 'org.openjfx.javafxplugin' version '0.0.10'
-    id 'org.beryx.jlink' version '2.24.2'
+    id 'org.beryx.jlink' version '2.24.4'
 }
 
 group = 'io.github.ititus'
