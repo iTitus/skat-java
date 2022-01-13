@@ -37,7 +37,7 @@ repositories {
 dependencies {
     implementation 'io.github.ititus:ititus-commons:1.5.14'
     implementation 'it.unimi.dsi:fastutil:8.5.6'
-    implementation platform('io.netty:netty-bom:4.1.72.Final')
+    implementation platform('io.netty:netty-bom:4.1.73.Final')
     implementation 'io.netty:netty-buffer'
     implementation 'io.netty:netty-codec'
     implementation 'io.netty:netty-common'
@@ -54,7 +54,7 @@ test {
 }
 
 javafx {
-    version = '17.0.0.1'
+    version = '17.0.1'
     modules = ['javafx.base', 'javafx.controls', 'javafx.graphics']
 }
 
