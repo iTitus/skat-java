@@ -5,8 +5,8 @@ import io.github.ititus.skat.network.buffer.ReadablePacketBuffer;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectMap;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectOpenHashMap;
 
-import static io.github.ititus.precondition.Precondition.notNull;
-import static io.github.ititus.precondition.Preconditions.check;
+import static io.github.ititus.commons.precondition.Precondition.notNull;
+import static io.github.ititus.commons.precondition.Preconditions.check;
 
 public enum ClientboundPacketType implements PacketBufferDeserializer<ClientboundPacket> {
 

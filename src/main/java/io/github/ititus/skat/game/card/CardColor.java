@@ -2,9 +2,9 @@ package io.github.ititus.skat.game.card;
 
 import io.github.ititus.skat.network.NetworkEnum;
 
-import static io.github.ititus.precondition.IntPrecondition.inBounds;
-import static io.github.ititus.precondition.IntPrecondition.inBoundsInclusive;
-import static io.github.ititus.precondition.Preconditions.check;
+import static io.github.ititus.commons.precondition.IntPrecondition.inBounds;
+import static io.github.ititus.commons.precondition.IntPrecondition.inBoundsInclusive;
+import static io.github.ititus.commons.precondition.Preconditions.check;
 
 public enum CardColor implements NetworkEnum<CardColor> {
 

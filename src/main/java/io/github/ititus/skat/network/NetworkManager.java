@@ -19,8 +19,8 @@ import java.net.InetSocketAddress;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import static io.github.ititus.precondition.BooleanPrecondition.isTrue;
-import static io.github.ititus.precondition.Preconditions.check;
+import static io.github.ititus.commons.precondition.BooleanPrecondition.isTrue;
+import static io.github.ititus.commons.precondition.Preconditions.check;
 
 public class NetworkManager extends SimpleChannelInboundHandler<ClientboundPacket> {
 

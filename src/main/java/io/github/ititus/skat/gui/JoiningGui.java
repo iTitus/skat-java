@@ -3,9 +3,9 @@ package io.github.ititus.skat.gui;
 import io.github.ititus.skat.network.packet.JoinPacket;
 import io.github.ititus.skat.network.packet.ResumePacket;
 
-import static io.github.ititus.precondition.BooleanPrecondition.isFalse;
-import static io.github.ititus.precondition.BooleanPrecondition.isTrue;
-import static io.github.ititus.precondition.Preconditions.check;
+import static io.github.ititus.commons.precondition.BooleanPrecondition.isFalse;
+import static io.github.ititus.commons.precondition.BooleanPrecondition.isTrue;
+import static io.github.ititus.commons.precondition.Preconditions.check;
 
 public class JoiningGui extends LoadingGui {
 

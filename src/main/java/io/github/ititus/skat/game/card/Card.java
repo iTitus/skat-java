@@ -8,10 +8,10 @@ import it.unimi.dsi.fastutil.bytes.Byte2ObjectOpenHashMap;
 
 import java.util.Comparator;
 
-import static io.github.ititus.precondition.IntPrecondition.inBounds;
-import static io.github.ititus.precondition.IntPrecondition.inBoundsInclusive;
-import static io.github.ititus.precondition.Precondition.notNull;
-import static io.github.ititus.precondition.Preconditions.check;
+import static io.github.ititus.commons.precondition.IntPrecondition.inBounds;
+import static io.github.ititus.commons.precondition.IntPrecondition.inBoundsInclusive;
+import static io.github.ititus.commons.precondition.Precondition.notNull;
+import static io.github.ititus.commons.precondition.Preconditions.check;
 import static io.github.ititus.skat.game.card.CardColor.*;
 import static io.github.ititus.skat.game.card.CardType.*;
 

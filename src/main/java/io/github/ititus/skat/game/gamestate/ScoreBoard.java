@@ -4,8 +4,8 @@ import io.github.ititus.skat.network.buffer.ReadablePacketBuffer;
 
 import java.util.Arrays;
 
-import static io.github.ititus.precondition.IntPrecondition.equalTo;
-import static io.github.ititus.precondition.Preconditions.check;
+import static io.github.ititus.commons.precondition.IntPrecondition.equalTo;
+import static io.github.ititus.commons.precondition.Preconditions.check;
 import static io.github.ititus.skat.SkatClient.MAX_PLAYERS;
 
 public class ScoreBoard {

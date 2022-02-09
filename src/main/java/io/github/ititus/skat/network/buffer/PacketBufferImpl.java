@@ -1,6 +1,6 @@
 package io.github.ititus.skat.network.buffer;
 
-import io.github.ititus.math.number.JavaMath;
+import io.github.ititus.commons.math.number.JavaMath;
 import io.github.ititus.skat.network.NetworkEnum;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectFunction;
@@ -12,14 +12,14 @@ import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.function.Function;
 
-import static io.github.ititus.precondition.BooleanPrecondition.isTrue;
-import static io.github.ititus.precondition.ComparablePrecondition.inBoundsInclusive;
-import static io.github.ititus.precondition.IntPrecondition.inBounds;
-import static io.github.ititus.precondition.IntPrecondition.inBoundsInclusive;
-import static io.github.ititus.precondition.LongPrecondition.inBoundsInclusive;
-import static io.github.ititus.precondition.Precondition.equalTo;
-import static io.github.ititus.precondition.Preconditions.check;
-import static io.github.ititus.precondition.StringPrecondition.notContains;
+import static io.github.ititus.commons.precondition.BooleanPrecondition.isTrue;
+import static io.github.ititus.commons.precondition.ComparablePrecondition.inBoundsInclusive;
+import static io.github.ititus.commons.precondition.IntPrecondition.inBounds;
+import static io.github.ititus.commons.precondition.IntPrecondition.inBoundsInclusive;
+import static io.github.ititus.commons.precondition.LongPrecondition.inBoundsInclusive;
+import static io.github.ititus.commons.precondition.Precondition.equalTo;
+import static io.github.ititus.commons.precondition.Preconditions.check;
+import static io.github.ititus.commons.precondition.StringPrecondition.notContains;
 
 public class PacketBufferImpl implements ReadablePacketBuffer, WritablePacketBuffer {
 

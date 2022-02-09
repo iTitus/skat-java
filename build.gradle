@@ -10,7 +10,7 @@ group = 'io.github.ititus'
 version = '1.0.0'
 
 wrapper {
-    gradleVersion '7.3.3'
+    gradleVersion '7.4'
 }
 
 java {
@@ -35,7 +35,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'io.github.ititus:ititus-commons:1.5.14'
+    implementation 'io.github.ititus:ititus-commons:2.0.1'
     implementation 'it.unimi.dsi:fastutil:8.5.6'
     implementation platform('io.netty:netty-bom:4.1.74.Final')
     implementation 'io.netty:netty-buffer'
@@ -54,7 +54,7 @@ test {
 }
 
 javafx {
-    version = '17.0.1'
+    version = '17.0.2'
     modules = ['javafx.base', 'javafx.controls', 'javafx.graphics']
 }
 

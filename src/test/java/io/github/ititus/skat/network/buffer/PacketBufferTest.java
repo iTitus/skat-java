@@ -1,7 +1,7 @@
 package io.github.ititus.skat.network.buffer;
 
-import io.github.ititus.math.number.BigIntegerMath;
-import io.github.ititus.math.number.JavaMath;
+import io.github.ititus.commons.math.number.BigIntegerMath;
+import io.github.ititus.commons.math.number.JavaMath;
 import io.netty.buffer.Unpooled;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;

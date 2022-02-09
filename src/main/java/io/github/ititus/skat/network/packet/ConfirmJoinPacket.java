@@ -8,8 +8,8 @@ import io.github.ititus.skat.network.buffer.ReadablePacketBuffer;
 import io.netty.channel.ChannelHandlerContext;
 import javafx.application.Platform;
 
-import static io.github.ititus.precondition.Precondition.equalTo;
-import static io.github.ititus.precondition.Preconditions.check;
+import static io.github.ititus.commons.precondition.Precondition.equalTo;
+import static io.github.ititus.commons.precondition.Preconditions.check;
 
 public class ConfirmJoinPacket implements ClientboundPacket {
 

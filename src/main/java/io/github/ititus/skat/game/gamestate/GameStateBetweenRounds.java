@@ -9,9 +9,9 @@ import io.github.ititus.skat.game.event.StartRoundEvent;
 
 import java.util.Optional;
 
-import static io.github.ititus.precondition.Precondition.isNull;
-import static io.github.ititus.precondition.Precondition.notNull;
-import static io.github.ititus.precondition.Preconditions.check;
+import static io.github.ititus.commons.precondition.Precondition.isNull;
+import static io.github.ititus.commons.precondition.Precondition.notNull;
+import static io.github.ititus.commons.precondition.Preconditions.check;
 import static io.github.ititus.skat.SkatClient.ACTIVE_PLAYERS;
 
 public class GameStateBetweenRounds extends GameState {
