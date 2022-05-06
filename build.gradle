@@ -37,7 +37,7 @@ repositories {
 dependencies {
     implementation 'io.github.ititus:ititus-commons:2.3.2'
     implementation 'it.unimi.dsi:fastutil:8.5.8'
-    implementation platform('io.netty:netty-bom:4.1.76.Final')
+    implementation platform('io.netty:netty-bom:4.1.77.Final')
     implementation 'io.netty:netty-buffer'
     implementation 'io.netty:netty-codec'
     implementation 'io.netty:netty-common'
