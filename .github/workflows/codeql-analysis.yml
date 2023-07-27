@@ -48,17 +48,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: 17
-          distribution: adopt
-
-      - name: Load Cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
+          distribution: temurin
 
       # Initializes the CodeQL tools for scanning.
       - name: Initialize CodeQL
@@ -87,7 +77,9 @@ jobs:
       #   make release
 
       - name: Build with Gradle
-        run: ./gradlew build
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: build
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
