@@ -5,7 +5,7 @@ import io.github.ititus.skat.network.packet.ClientboundPacket;
 import io.github.ititus.skat.network.packet.ServerboundPacket;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
-import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.nio.NioIoHandler;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
@@ -42,7 +42,7 @@ public class NetworkManager extends SimpleChannelInboundHandler<ClientboundPacke
         this.connectionEstablishedListener = connectionEstablishedListener;
         this.disconnectListener = disconnectListener;
 
-        this.eventLoopGroup = new NioEventLoopGroup(0, new DefaultThreadFactory("Netty Event Loop Thread #", true));
+        this.eventLoopGroup = new MultiThreadIoEventLoopGroup(new DefaultThreadFactory("Netty Event Loop Thread #", true), NioIoHandler.newFactory());
         this.channelFuture = new Bootstrap()
                 .group(this.eventLoopGroup)
                 .channel(NioSocketChannel.class)
