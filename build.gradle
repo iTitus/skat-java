@@ -34,21 +34,16 @@ repositories {
     mavenCentral()
 }
 
-configurations.configureEach {
-    // the optional dependencies on jboss-marshalling / protobuf break in testing
-    exclude group: 'io.netty', module: 'netty-codec-marshalling'
-    exclude group: 'io.netty', module: 'netty-codec-protobuf'
-}
-
 dependencies {
     implementation 'io.github.ititus:ititus-commons:2.3.3'
     implementation 'it.unimi.dsi:fastutil:8.5.15'
     implementation platform('io.netty:netty-bom:4.2.1.Final')
-    implementation 'io.netty:netty-common'
-    implementation 'io.netty:netty-buffer'
-    implementation 'io.netty:netty-codec'
-    implementation 'io.netty:netty-transport'
-    implementation 'io.netty:netty-handler'
+    implementation('io.netty:netty-all') {
+        exclude group: 'io.netty', module: 'netty-codec-marshalling' // would require jboss marshalling
+        exclude group: 'io.netty', module: 'netty-codec-protobuf' // would require google protobuf
+        exclude group: 'io.netty', module: 'netty-codec-xml' // would require fasterxml aalto
+        exclude group: 'io.netty', module: 'netty-handler-ssl-ocsp' // would require bouncycastle
+    }
 
     testImplementation platform('org.junit:junit-bom:5.12.2')
     testImplementation 'org.junit.jupiter:junit-jupiter'
