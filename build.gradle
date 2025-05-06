@@ -43,7 +43,7 @@ configurations.configureEach {
 dependencies {
     implementation 'io.github.ititus:ititus-commons:2.3.3'
     implementation 'it.unimi.dsi:fastutil:8.5.15'
-    implementation platform('io.netty:netty-bom:4.2.0.Final')
+    implementation platform('io.netty:netty-bom:4.2.1.Final')
     implementation 'io.netty:netty-common'
     implementation 'io.netty:netty-buffer'
     implementation 'io.netty:netty-codec'
