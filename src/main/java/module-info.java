@@ -1,11 +1,10 @@
 module io.github.ititus.skat {
     requires io.github.ititus.commons;
     requires it.unimi.dsi.fastutil;
-    requires io.netty.common;
     requires io.netty.buffer;
     requires io.netty.codec;
+    requires io.netty.common;
     requires io.netty.transport;
-    requires io.netty.handler;
     requires javafx.base;
     requires javafx.controls;
     requires javafx.graphics;
